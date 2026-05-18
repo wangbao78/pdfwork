@@ -19,8 +19,8 @@ const GS_PATHS = platform() === "win32"
   ? ["D:\\Ghostscript\\bin", "C:\\Program Files\\gs\\gs10.04.0\\bin"]
   : []
 
-function getEnv(): Record<string, string> {
-  const env = { ...process.env } as Record<string, string>
+function getEnv(): NodeJS.ProcessEnv {
+  const env = { ...process.env }
   if (GS_PATHS.length > 0) {
     env.PATH = [...GS_PATHS, env.PATH || ""].join(";")
   }
