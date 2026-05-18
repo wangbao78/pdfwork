@@ -1,14 +1,18 @@
 import Stripe from "stripe"
 
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
-  apiVersion: "2026-04-22.dahlia",
-})
+function getStripe(): Stripe | null {
+  if (!process.env.STRIPE_SECRET_KEY) return null
+  return new Stripe(process.env.STRIPE_SECRET_KEY, {
+    apiVersion: "2026-04-22.dahlia",
+  })
+}
 
 export async function createCheckoutSession(
   userId: string,
   email: string,
 ): Promise<string | null> {
-  if (!process.env.STRIPE_PRICE_ID) return null
+  const stripe = getStripe()
+  if (!stripe || !process.env.STRIPE_PRICE_ID) return null
 
   const session = await stripe.checkout.sessions.create({
     mode: "subscription",
