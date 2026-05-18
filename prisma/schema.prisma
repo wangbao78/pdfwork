@@ -1,0 +1,54 @@
+generator client {
+  provider = "prisma-client"
+  output   = "./generated/client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id                   String    @id @default(cuid())
+  email                String    @unique
+  name                 String?
+  password             String?
+  emailVerified        DateTime?
+  image                String?
+  plan                 Plan      @default(FREE)
+  stripeCustomerId     String?
+  stripeSubscriptionId String?
+  dailyUsage           Int       @default(0)
+  lastUsageDate        DateTime?
+  totalUsage           Int       @default(0)
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+  files                File[]
+}
+
+enum Plan {
+  FREE
+  PRO
+}
+
+model File {
+  id        String   @id @default(cuid())
+  name      String
+  size      Int
+  type      String
+  status    Status   @default(PENDING)
+  r2Key     String?
+  resultKey String?
+  error     String?
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  expiresAt DateTime
+}
+
+enum Status {
+  PENDING
+  PROCESSING
+  DONE
+  ERROR
+}
