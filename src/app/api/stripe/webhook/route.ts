@@ -1,13 +1,14 @@
 import { NextResponse } from "next/server"
 import { headers } from "next/headers"
-import { stripe } from "@/lib/stripe"
+import { getStripe } from "@/lib/stripe"
 import { db } from "@/lib/db"
 
 export async function POST(req: Request) {
   const body = await req.text()
   const sig = (await headers()).get("stripe-signature")
 
-  if (!sig || !process.env.STRIPE_WEBHOOK_SECRET) {
+  const stripe = getStripe()
+  if (!sig || !process.env.STRIPE_WEBHOOK_SECRET || !stripe) {
     return NextResponse.json({ error: "Bad Request" }, { status: 400 })
   }
 
