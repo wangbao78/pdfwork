@@ -1,7 +1,7 @@
 FROM node:22-alpine
 
-RUN apk add --no-cache ghostscript python3 py3-pip py3-pymupdf py3-docx \
-  && pip3 install --break-system-packages --no-deps pdf2docx
+RUN apk add --no-cache ghostscript libreoffice-writer \
+  && ls -la /usr/bin/soffice 2>&1 || find / -name soffice -type f 2>/dev/null
 
 WORKDIR /app
 
