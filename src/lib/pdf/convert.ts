@@ -1,7 +1,7 @@
 import { execFile } from "child_process"
 import { promisify } from "util"
 import { writeFile, readFile, unlink, mkdir } from "fs/promises"
-import { tmpdir } from "os"
+import { tmpdir, platform } from "os"
 import { join, basename } from "path"
 import { existsSync } from "fs"
 import { getDownloadUrl, getUploadUrl } from "@/lib/r2"
@@ -16,17 +16,41 @@ const isR2Configured =
 const LOCAL_DIR = join(process.cwd(), ".data")
 const LOCAL_RESULTS = join(LOCAL_DIR, "results")
 
-/** Convert PDF to DOCX — uses LibreOffice on Linux, pdf2docx on Windows */
+/** Try to run a command, return the first one that works */
+async function tryExecCmds(
+  cmds: string[],
+  args: string[],
+  timeout: number,
+): Promise<void> {
+  let lastError: Error | undefined
+  for (const cmd of cmds) {
+    try {
+      await execFileP(cmd, args, { timeout })
+      return
+    } catch (e: any) {
+      lastError = e
+      const msg = (e.stderr || e.message || "").toString()
+      // If command not found, try next
+      if (msg.includes("command not found") || msg.includes("ENOENT")) continue
+      throw e
+    }
+  }
+  throw lastError
+}
+
+/** Convert PDF to DOCX */
 async function doConvert(inputPath: string): Promise<Buffer> {
   const outputDir = tmpdir()
   const baseName = basename(inputPath).replace(/\.pdf$/i, "")
   const outputPath = join(outputDir, `${baseName}.docx`)
 
-  // Linux/Docker: use LibreOffice
   try {
-    await execFileP("libreoffice", [
-      "--headless", "--convert-to", "docx", "--outdir", outputDir, inputPath,
-    ], { timeout: 120_000 })
+    // Try soffice first (works on Alpine/Docker and Windows), then libreoffice
+    await tryExecCmds(
+      ["soffice", "libreoffice"],
+      ["--headless", "--convert-to", "docx", "--outdir", outputDir, inputPath],
+      120_000,
+    )
 
     const buf = await readFile(outputPath)
     if (buf.length === 0) throw new Error("空文件")
@@ -34,10 +58,15 @@ async function doConvert(inputPath: string): Promise<Buffer> {
     return buf
   } catch (e: any) {
     const msg = (e.stderr || e.message || "").toString()
-    // If LibreOffice is not available, try pdf2docx fallback (Windows dev)
+
+    // If neither soffice nor libreoffice found, try pdf2docx (Windows dev only)
     if (msg.includes("command not found") || msg.includes("ENOENT")) {
-      return doPdf2docxConvert(inputPath, outputPath)
+      if (platform() === "win32") {
+        return doPdf2docxConvert(inputPath)
+      }
+      throw new Error("LibreOffice 未安装，无法转换")
     }
+
     if (msg.includes("encrypted") || msg.includes("password")) {
       throw new Error("此 PDF 已加密，无法转换")
     }
@@ -45,8 +74,11 @@ async function doConvert(inputPath: string): Promise<Buffer> {
   }
 }
 
-/** Fallback: use pdf2docx Python script (Windows dev) */
-async function doPdf2docxConvert(inputPath: string, outputPath: string): Promise<Buffer> {
+/** Fallback: use pdf2docx Python script (Windows dev only) */
+async function doPdf2docxConvert(inputPath: string): Promise<Buffer> {
+  const outputDir = tmpdir()
+  const baseName = basename(inputPath).replace(/\.pdf$/i, "")
+  const outputPath = join(outputDir, `${baseName}.docx`)
   const script = join(process.cwd(), "scripts", "convert.py")
   const python = existsSync(
     join(process.cwd(), "..", ".venv", "Scripts", "python.exe"),
