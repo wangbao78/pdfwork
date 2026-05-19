@@ -1,7 +1,7 @@
 FROM node:22-alpine
 
-RUN apk add --no-cache libreoffice-writer libreoffice-draw libreoffice-impress ghostscript \
-  && for p in /usr/bin/soffice /usr/lib/libreoffice/program/soffice; do [ -f "$p" ] && echo "FOUND: $p"; done
+RUN apk add --no-cache ghostscript python3 py3-pip \
+  && pip3 install --break-system-packages pdf2docx
 
 WORKDIR /app
 
