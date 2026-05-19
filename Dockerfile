@@ -1,7 +1,8 @@
 FROM node:22-alpine
 
-RUN apk add --no-cache libreoffice libreoffice-writer ghostscript \
-  && find / -name "soffice" -o -name "libreoffice" 2>/dev/null || true
+RUN apk add --no-cache libreoffice ghostscript \
+  && test -f /usr/bin/soffice && echo "LO found at /usr/bin/soffice" \
+  || (echo "LO not at /usr/bin/soffice, searching..." && find / -name soffice -type f 2>/dev/null)
 
 WORKDIR /app
 
