@@ -45,9 +45,14 @@ async function doConvert(inputPath: string): Promise<Buffer> {
   const outputPath = join(outputDir, `${baseName}.docx`)
 
   try {
-    // Try soffice first (works on Alpine/Docker and Windows), then libreoffice
+    // Try all possible LibreOffice binary locations
     await tryExecCmds(
-      ["soffice", "libreoffice"],
+      [
+        "/usr/lib/libreoffice/program/soffice",
+        "/usr/bin/soffice",
+        "soffice",
+        "libreoffice",
+      ],
       ["--headless", "--convert-to", "docx", "--outdir", outputDir, inputPath],
       120_000,
     )
