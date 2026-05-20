@@ -1,6 +1,6 @@
 FROM node:22-alpine
 
-RUN apk add --no-cache ghostscript libreoffice-writer font-noto-cjk
+RUN apk add --no-cache ghostscript libreoffice-writer font-wqy-zenhei
 
 WORKDIR /app
 
