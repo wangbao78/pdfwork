@@ -1,7 +1,6 @@
 FROM node:22-alpine
 
-RUN apk add --no-cache ghostscript libreoffice-writer \
-  && ls -la /usr/bin/soffice 2>&1 || find / -name soffice -type f 2>/dev/null
+RUN apk add --no-cache ghostscript libreoffice-writer font-noto-cjk
 
 WORKDIR /app
 
