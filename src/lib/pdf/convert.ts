@@ -16,8 +16,11 @@ const isR2Configured =
 const LOCAL_DIR = join(process.cwd(), ".data")
 const LOCAL_RESULTS = join(LOCAL_DIR, "results")
 
-/** Find usable Python for pdf2docx (Windows dev) */
+/** Find usable Python for pdf2docx */
 function findPython(): string | null {
+  // System python3 (Linux/Docker)
+  if (existsSync("/usr/bin/python3")) return "python3"
+  // Windows venv
   const venvPython = join(process.cwd(), "..", ".venv", "Scripts", "python.exe")
   if (existsSync(venvPython)) return venvPython
   return null
@@ -80,15 +83,20 @@ async function doPdf2docxConvert(inputPath: string): Promise<Buffer> {
   }
 }
 
-/** Main entry: try LO first, fallback to pdf2docx on Windows dev */
+/** Main entry: try pdf2docx first (better Chinese text), LO as fallback */
 async function doConvert(inputPath: string): Promise<Buffer> {
+  // Try pdf2docx first — PyMuPDF extracts Chinese text more accurately
   try {
-    return await doLibreOfficeConvert(inputPath)
+    return await doPdf2docxConvert(inputPath)
   } catch (e: any) {
     const msg = (e.message || "").toString()
-    // If LO not installed, fallback to pdf2docx (Windows dev)
-    if (msg.includes("未安装")) {
-      return doPdf2docxConvert(inputPath)
+    if (msg.includes("pdf2docx 不可用") || msg.includes("not found")) {
+      // Fallback to LibreOffice
+      try {
+        return await doLibreOfficeConvert(inputPath)
+      } catch (e2: any) {
+        throw new Error(`LibreOffice 转换也失败: ${(e2.message || "").toString().slice(0, 200)}`)
+      }
     }
     throw e
   }
