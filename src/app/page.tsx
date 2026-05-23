@@ -1,154 +1,147 @@
 import Link from "next/link"
-import { FileType, Combine, Shrink, Droplets, Scissors, Image, ImageUp, Images, RotateCw, ArrowRight } from "lucide-react"
+import {
+  FileType, Combine, Shrink, Droplets, Scissors, Image,
+  ImageUp, Images, RotateCw, FileText, Lock, ArrowRight,
+} from "lucide-react"
 
-const tools = [
+interface Tool {
+  href: string
+  icon: React.ComponentType<{ className?: string }>
+  title: string
+  desc: string
+  bgLight: string
+  iconColor: string
+  soon?: boolean
+}
+
+const convertTools: Tool[] = [
   {
-    href: "/tools/pdf-to-word",
-    icon: FileType,
-    title: "PDF 转 Word",
-    desc: "将 PDF 文档转换为可编辑的 Word 文件，保留原始排版格式。",
-    gradient: "from-blue-500 to-cyan-500",
-    bgLight: "bg-blue-50 dark:bg-blue-950",
-    iconColor: "text-blue-600 dark:text-blue-400",
+    href: "/tools/pdf-to-word", icon: FileType,
+    title: "PDF 转 Word", desc: "将 PDF 转换为可编辑的 Word 文件。",
+    bgLight: "bg-blue-50 dark:bg-blue-950", iconColor: "text-blue-600 dark:text-blue-400",
   },
   {
-    href: "/tools/merge-pdf",
-    icon: Combine,
-    title: "合并 PDF",
-    desc: "将多个 PDF 文件按顺序合并为一个文档，支持拖拽排序。",
-    gradient: "from-violet-500 to-purple-500",
-    bgLight: "bg-violet-50 dark:bg-violet-950",
-    iconColor: "text-violet-600 dark:text-violet-400",
+    href: "/tools/pdf-to-jpg", icon: Images,
+    title: "PDF 转 JPG", desc: "将 PDF 每页转为 JPG 图片，200 DPI。",
+    bgLight: "bg-cyan-50 dark:bg-cyan-950", iconColor: "text-cyan-600 dark:text-cyan-400",
   },
   {
-    href: "/tools/compress-pdf",
-    icon: Shrink,
-    title: "压缩 PDF",
-    desc: "减小 PDF 文件体积，提供标准/高/极限三种压缩级别。",
-    gradient: "from-emerald-500 to-green-500",
-    bgLight: "bg-emerald-50 dark:bg-emerald-950",
-    iconColor: "text-emerald-600 dark:text-emerald-400",
+    href: "/tools/extract-images", icon: Image,
+    title: "提取图片", desc: "从 PDF 中提取所有内嵌图片。",
+    bgLight: "bg-sky-50 dark:bg-sky-950", iconColor: "text-sky-600 dark:text-sky-400",
   },
   {
-    href: "/tools/watermark",
-    icon: Droplets,
-    title: "PDF 加水印",
-    desc: "给 PDF 页面添加文字水印，可自定义文字、大小、透明度。",
-    gradient: "from-orange-500 to-amber-500",
-    bgLight: "bg-orange-50 dark:bg-orange-950",
-    iconColor: "text-orange-600 dark:text-orange-400",
+    href: "/tools/image-to-pdf", icon: ImageUp,
+    title: "图片转 PDF", desc: "将多张图片合成为 PDF 文件。",
+    bgLight: "bg-teal-50 dark:bg-teal-950", iconColor: "text-teal-600 dark:text-teal-400",
   },
   {
-    href: "/tools/split-pdf",
-    icon: Scissors,
-    title: "拆分 PDF",
-    desc: "从 PDF 中抽取指定页面，支持范围输入如 1-5, 8, 10-12。",
-    gradient: "from-rose-500 to-pink-500",
-    bgLight: "bg-rose-50 dark:bg-rose-950",
-    iconColor: "text-rose-600 dark:text-rose-400",
-  },
-  {
-    href: "/tools/extract-images",
-    icon: Image,
-    title: "提取图片",
-    desc: "从 PDF 中提取所有内嵌图片，支持逐个下载。",
-    gradient: "from-sky-500 to-indigo-500",
-    bgLight: "bg-sky-50 dark:bg-sky-950",
-    iconColor: "text-sky-600 dark:text-sky-400",
-  },
-  {
-    href: "/tools/image-to-pdf",
-    icon: ImageUp,
-    title: "图片转 PDF",
-    desc: "将多张图片合成为 PDF 文件，支持 JPG、PNG、WebP。",
-    gradient: "from-teal-500 to-emerald-500",
-    bgLight: "bg-teal-50 dark:bg-teal-950",
-    iconColor: "text-teal-600 dark:text-teal-400",
-  },
-  {
-    href: "/tools/pdf-to-jpg",
-    icon: Images,
-    title: "PDF 转 JPG",
-    desc: "将 PDF 每页转为 JPG 图片，200 DPI 清晰度。",
-    gradient: "from-cyan-500 to-blue-500",
-    bgLight: "bg-cyan-50 dark:bg-cyan-950",
-    iconColor: "text-cyan-600 dark:text-cyan-400",
-  },
-  {
-    href: "/tools/rotate-pdf",
-    icon: RotateCw,
-    title: "旋转 PDF",
-    desc: "将 PDF 所有页面按 90°/180°/270° 旋转。",
-    gradient: "from-fuchsia-500 to-purple-500",
-    bgLight: "bg-fuchsia-50 dark:bg-fuchsia-950",
-    iconColor: "text-fuchsia-600 dark:text-fuchsia-400",
+    href: "/tools/office-to-pdf", icon: FileText,
+    title: "Office 转 PDF", desc: "Word、Excel、PPT 转 PDF。",
+    bgLight: "bg-indigo-50 dark:bg-indigo-950", iconColor: "text-indigo-600 dark:text-indigo-400",
   },
 ]
+
+const editTools: Tool[] = [
+  {
+    href: "/tools/merge-pdf", icon: Combine,
+    title: "合并 PDF", desc: "将多个 PDF 合并为一个文档。",
+    bgLight: "bg-violet-50 dark:bg-violet-950", iconColor: "text-violet-600 dark:text-violet-400",
+  },
+  {
+    href: "/tools/split-pdf", icon: Scissors,
+    title: "拆分 PDF", desc: "从 PDF 中抽取指定页面。",
+    bgLight: "bg-rose-50 dark:bg-rose-950", iconColor: "text-rose-600 dark:text-rose-400",
+  },
+  {
+    href: "/tools/rotate-pdf", icon: RotateCw,
+    title: "旋转 PDF", desc: "将 PDF 页面按 90°/180°/270° 旋转。",
+    bgLight: "bg-fuchsia-50 dark:bg-fuchsia-950", iconColor: "text-fuchsia-600 dark:text-fuchsia-400",
+  },
+  {
+    href: "/tools/reorder-pdf", icon: ArrowRight,
+    title: "页面排序", desc: "拖拽调整 PDF 页面顺序。",
+    bgLight: "bg-amber-50 dark:bg-amber-950", iconColor: "text-amber-600 dark:text-amber-400",
+  },
+]
+
+const optimizeTools: Tool[] = [
+  {
+    href: "/tools/compress-pdf", icon: Shrink,
+    title: "压缩 PDF", desc: "减小 PDF 文件体积，三级压缩。",
+    bgLight: "bg-emerald-50 dark:bg-emerald-950", iconColor: "text-emerald-600 dark:text-emerald-400",
+  },
+  {
+    href: "/tools/watermark", icon: Droplets,
+    title: "PDF 加水印", desc: "给 PDF 添加文字水印。",
+    bgLight: "bg-orange-50 dark:bg-orange-950", iconColor: "text-orange-600 dark:text-orange-400",
+  },
+  {
+    href: "/tools/protect-pdf", icon: Lock,
+    title: "加密 / 解锁", desc: "给 PDF 加打开密码或解除保护。",
+    bgLight: "bg-red-50 dark:bg-red-950", iconColor: "text-red-600 dark:text-red-400",
+  },
+]
+
+function ToolCard({ tool }: { tool: Tool }) {
+  const Icon = tool.icon
+  return (
+    <Link
+      href={tool.href}
+      className={`group relative overflow-hidden rounded-xl border bg-card p-5 transition-all hover:shadow-md hover:-translate-y-0.5 ${
+        tool.soon ? "opacity-60 pointer-events-none" : ""
+      }`}
+    >
+      <div className={`inline-flex h-10 w-10 items-center justify-center rounded-lg ${tool.bgLight}`}>
+        <Icon className={`h-5 w-5 ${tool.iconColor}`} />
+      </div>
+      <h3 className="mt-3 text-sm font-semibold">{tool.title}</h3>
+      <p className="mt-1 text-xs text-muted-foreground leading-relaxed">{tool.desc}</p>
+      {tool.soon && (
+        <span className="absolute top-2 right-2 rounded-full bg-amber-100 dark:bg-amber-900 px-2 py-0.5 text-[10px] text-amber-700 dark:text-amber-300">
+          即将推出
+        </span>
+      )}
+    </Link>
+  )
+}
 
 export default function Home() {
   return (
     <>
-      {/* Hero */}
-      <section className="mx-auto w-full max-w-4xl px-4 pt-20 pb-12 text-center">
-        <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
-          PDF 工具箱
-        </h1>
-        <p className="mt-4 text-lg text-muted-foreground">
-          免费在线处理 PDF 文件 — 转换、合并、压缩，简单高效
-        </p>
+      <section className="mx-auto w-full max-w-5xl px-4 pt-16 pb-10 text-center">
+        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">PDF 工具箱</h1>
+        <p className="mt-3 text-muted-foreground">13 个工具，免费在线处理 PDF — 转换、编辑、优化</p>
       </section>
 
-      {/* Tool Cards */}
-      <section className="mx-auto w-full max-w-4xl px-4 pb-12">
-        <div className="grid gap-6 sm:grid-cols-2 sm:grid-cols-2 lg:grid-cols-3">
-          {tools.map((tool) => (
-            <Link
-              key={tool.href}
-              href={tool.href}
-              className="group relative overflow-hidden rounded-xl border bg-card p-6 transition-all hover:shadow-lg hover:-translate-y-1"
-            >
-              <div
-                className={`inline-flex h-11 w-11 items-center justify-center rounded-lg ${tool.bgLight}`}
-              >
-                <tool.icon className={`h-5 w-5 ${tool.iconColor}`} />
-              </div>
-              <h3 className="mt-4 font-semibold">{tool.title}</h3>
-              <p className="mt-1 text-sm text-muted-foreground leading-relaxed">
-                {tool.desc}
-              </p>
-              <div className="mt-4 flex items-center text-sm font-medium text-primary opacity-0 transition-opacity group-hover:opacity-100">
-                开始使用
-                <ArrowRight className="ml-1 h-3 w-3" />
-              </div>
-            </Link>
-          ))}
-        </div>
-      </section>
-
-      {/* Features */}
-      <section className="mx-auto w-full max-w-4xl px-4 pb-20">
-        <div className="rounded-xl border bg-muted/30 p-8">
-          <div className="grid gap-8 sm:grid-cols-3">
-            <div className="text-center">
-              <div className="text-2xl font-bold">3</div>
-              <div className="mt-1 text-sm text-muted-foreground">次/天免费使用</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold">5MB</div>
-              <div className="mt-1 text-sm text-muted-foreground">免费文件大小上限</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold">100MB</div>
-              <div className="mt-1 text-sm text-muted-foreground">Pro 文件大小上限</div>
-            </div>
+      <section className="mx-auto w-full max-w-5xl px-4 pb-16 space-y-10">
+        <div>
+          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+            <span className="h-1.5 w-1.5 rounded-full bg-blue-500" />
+            转换
+          </h2>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+            {convertTools.map((t) => <ToolCard key={t.href} tool={t} />)}
           </div>
-          <div className="mt-6 text-center">
-            <Link
-              href="/pricing"
-              className="text-sm font-medium text-primary hover:underline"
-            >
-              查看完整定价 →
-            </Link>
+        </div>
+
+        <div>
+          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+            <span className="h-1.5 w-1.5 rounded-full bg-violet-500" />
+            编辑
+          </h2>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {editTools.map((t) => <ToolCard key={t.href} tool={t} />)}
+          </div>
+        </div>
+
+        <div>
+          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+            优化与安全
+          </h2>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {optimizeTools.map((t) => <ToolCard key={t.href} tool={t} />)}
           </div>
         </div>
       </section>
