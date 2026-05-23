@@ -2,6 +2,7 @@ import Link from "next/link"
 import {
   FileType, Combine, Shrink, Droplets, Scissors, Image,
   ImageUp, Images, RotateCw, FileText, Lock, ArrowRight,
+  Layers, ScanText, Zap,
 } from "lucide-react"
 
 interface Tool {
@@ -83,6 +84,27 @@ const optimizeTools: Tool[] = [
   },
 ]
 
+const advancedTools: Tool[] = [
+  {
+    href: "/pricing", icon: Layers,
+    title: "批量处理", desc: "一次上传多个文件，批量操作。",
+    bgLight: "bg-slate-100 dark:bg-slate-800", iconColor: "text-slate-400 dark:text-slate-500",
+    soon: true,
+  },
+  {
+    href: "/pricing", icon: ScanText,
+    title: "OCR 识别", desc: "扫描件中的文字转为可编辑文本。",
+    bgLight: "bg-slate-100 dark:bg-slate-800", iconColor: "text-slate-400 dark:text-slate-500",
+    soon: true,
+  },
+  {
+    href: "/pricing", icon: Zap,
+    title: "图片水印", desc: "上传图片作为水印叠加到 PDF。",
+    bgLight: "bg-slate-100 dark:bg-slate-800", iconColor: "text-slate-400 dark:text-slate-500",
+    soon: true,
+  },
+]
+
 function ToolCard({ tool }: { tool: Tool }) {
   const Icon = tool.icon
   return (
@@ -98,8 +120,8 @@ function ToolCard({ tool }: { tool: Tool }) {
       <h3 className="mt-3 text-sm font-semibold">{tool.title}</h3>
       <p className="mt-1 text-xs text-muted-foreground leading-relaxed">{tool.desc}</p>
       {tool.soon && (
-        <span className="absolute top-2 right-2 rounded-full bg-amber-100 dark:bg-amber-900 px-2 py-0.5 text-[10px] text-amber-700 dark:text-amber-300">
-          即将推出
+        <span className="absolute top-2 right-2 rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-medium text-primary">
+          Pro
         </span>
       )}
     </Link>
@@ -111,7 +133,7 @@ export default function Home() {
     <>
       <section className="mx-auto w-full max-w-5xl px-4 pt-16 pb-10 text-center">
         <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">PDF 工具箱</h1>
-        <p className="mt-3 text-muted-foreground">13 个工具，免费在线处理 PDF — 转换、编辑、优化</p>
+        <p className="mt-3 text-muted-foreground">13+ 免费工具，在线处理 PDF — 转换、编辑、优化</p>
       </section>
 
       <section className="mx-auto w-full max-w-5xl px-4 pb-16 space-y-10">
@@ -142,6 +164,17 @@ export default function Home() {
           </h2>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {optimizeTools.map((t) => <ToolCard key={t.href} tool={t} />)}
+          </div>
+        </div>
+
+        <div>
+          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+            <span className="h-1.5 w-1.5 rounded-full bg-slate-400" />
+            高级
+            <span className="ml-2 rounded bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary">Pro</span>
+          </h2>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {advancedTools.map((t) => <ToolCard key={t.href} tool={t} />)}
           </div>
         </div>
       </section>
