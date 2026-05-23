@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { FileType, Combine, Shrink, Droplets, ArrowRight } from "lucide-react"
+import { FileType, Combine, Shrink, Droplets, Scissors, ArrowRight } from "lucide-react"
 
 const tools = [
   {
@@ -38,6 +38,15 @@ const tools = [
     bgLight: "bg-orange-50 dark:bg-orange-950",
     iconColor: "text-orange-600 dark:text-orange-400",
   },
+  {
+    href: "/tools/split-pdf",
+    icon: Scissors,
+    title: "拆分 PDF",
+    desc: "从 PDF 中抽取指定页面，支持范围输入如 1-5, 8, 10-12。",
+    gradient: "from-rose-500 to-pink-500",
+    bgLight: "bg-rose-50 dark:bg-rose-950",
+    iconColor: "text-rose-600 dark:text-rose-400",
+  },
 ]
 
 export default function Home() {
@@ -55,7 +64,7 @@ export default function Home() {
 
       {/* Tool Cards */}
       <section className="mx-auto w-full max-w-4xl px-4 pb-12">
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
           {tools.map((tool) => (
             <Link
               key={tool.href}
