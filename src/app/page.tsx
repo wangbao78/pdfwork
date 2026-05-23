@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { FileType, Combine, Shrink, ArrowRight } from "lucide-react"
+import { FileType, Combine, Shrink, Droplets, ArrowRight } from "lucide-react"
 
 const tools = [
   {
@@ -29,6 +29,15 @@ const tools = [
     bgLight: "bg-emerald-50 dark:bg-emerald-950",
     iconColor: "text-emerald-600 dark:text-emerald-400",
   },
+  {
+    href: "/tools/watermark",
+    icon: Droplets,
+    title: "PDF 加水印",
+    desc: "给 PDF 页面添加文字水印，可自定义文字、大小、透明度。",
+    gradient: "from-orange-500 to-amber-500",
+    bgLight: "bg-orange-50 dark:bg-orange-950",
+    iconColor: "text-orange-600 dark:text-orange-400",
+  },
 ]
 
 export default function Home() {
@@ -46,7 +55,7 @@ export default function Home() {
 
       {/* Tool Cards */}
       <section className="mx-auto w-full max-w-4xl px-4 pb-12">
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {tools.map((tool) => (
             <Link
               key={tool.href}
