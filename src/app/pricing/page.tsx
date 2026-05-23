@@ -8,12 +8,13 @@ const plans = [
     period: "",
     features: [
       { text: "文件 ≤ 10MB，50 页", ok: true },
-      { text: "PDF 转 Word", ok: true },
-      { text: "合并 PDF", ok: true },
+      { text: "PDF 转 Word / JPG / 提取图片", ok: true },
+      { text: "图片转 PDF", ok: true },
+      { text: "合并 / 拆分 / 旋转 / 排序", ok: true },
       { text: "压缩 PDF（标准 / 高）", ok: true },
       { text: "PDF 加水印（文字）", ok: true },
-      { text: "拆分 PDF", ok: true },
-      { text: "提取图片", ok: true },
+      { text: "Office 转 PDF", ok: false },
+      { text: "加密 / 解锁", ok: false },
       { text: "极限压缩", ok: false },
       { text: "图片水印", ok: false },
       { text: "批量处理", ok: false },
@@ -29,12 +30,13 @@ const plans = [
     featured: true,
     features: [
       { text: "文件 ≤ 100MB，200 页", ok: true },
-      { text: "PDF 转 Word", ok: true },
-      { text: "合并 PDF", ok: true },
+      { text: "PDF 转 Word / JPG / 提取图片", ok: true },
+      { text: "图片转 PDF", ok: true },
+      { text: "合并 / 拆分 / 旋转 / 排序", ok: true },
       { text: "压缩 PDF（含极限）", ok: true },
       { text: "PDF 加水印（文字）", ok: true },
-      { text: "拆分 PDF", ok: true },
-      { text: "提取图片", ok: true },
+      { text: "Office 转 PDF", ok: true },
+      { text: "加密 / 解锁", ok: true },
       { text: "极限压缩", ok: true },
       { text: "图片水印", ok: true },
       { text: "批量处理", ok: true, soon: true },
@@ -75,7 +77,7 @@ export default function PricingPage() {
               <span className="text-4xl font-bold">{plan.price}</span>
               <span className="text-muted-foreground">{plan.period}</span>
             </div>
-            <ul className="mt-8 space-y-3">
+            <ul className="mt-8 space-y-2.5">
               {plan.features.map((f: any) => (
                 <li key={f.text} className="flex items-center gap-3 text-sm">
                   {f.ok ? (
