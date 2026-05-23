@@ -3,6 +3,7 @@ import Credentials from "next-auth/providers/credentials"
 import Google from "next-auth/providers/google"
 import bcrypt from "bcryptjs"
 import { findUserByEmail } from "@/lib/user-store"
+import { db } from "@/lib/db"
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   session: { strategy: "jwt" },
@@ -41,10 +42,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }),
   ],
   callbacks: {
-    jwt({ token, user }) {
+    async jwt({ token, user }) {
       if (user) {
         token.id = user.id
-        token.plan = "FREE"
+        try {
+          const dbUser = await db.user.findUnique({ where: { id: user.id! } })
+          token.plan = dbUser?.plan || "FREE"
+        } catch {
+          token.plan = "FREE"
+        }
       }
       return token
     },

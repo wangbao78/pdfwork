@@ -21,4 +21,4 @@ COPY . .
 RUN npm run build
 
 EXPOSE 3000
-CMD sh -c "npx prisma generate && npm start"
+CMD sh -c "npx prisma generate && npx prisma db push --accept-data-loss && npm start"
