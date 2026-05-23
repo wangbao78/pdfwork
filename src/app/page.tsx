@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { FileType, Combine, Shrink, Droplets, Scissors, ArrowRight } from "lucide-react"
+import { FileType, Combine, Shrink, Droplets, Scissors, Image, ArrowRight } from "lucide-react"
 
 const tools = [
   {
@@ -47,6 +47,15 @@ const tools = [
     bgLight: "bg-rose-50 dark:bg-rose-950",
     iconColor: "text-rose-600 dark:text-rose-400",
   },
+  {
+    href: "/tools/extract-images",
+    icon: Image,
+    title: "提取图片",
+    desc: "从 PDF 中提取所有内嵌图片，支持逐个下载。",
+    gradient: "from-sky-500 to-indigo-500",
+    bgLight: "bg-sky-50 dark:bg-sky-950",
+    iconColor: "text-sky-600 dark:text-sky-400",
+  },
 ]
 
 export default function Home() {
@@ -64,7 +73,7 @@ export default function Home() {
 
       {/* Tool Cards */}
       <section className="mx-auto w-full max-w-4xl px-4 pb-12">
-        <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
+        <div className="grid gap-6 sm:grid-cols-2 sm:grid-cols-2 lg:grid-cols-3">
           {tools.map((tool) => (
             <Link
               key={tool.href}
