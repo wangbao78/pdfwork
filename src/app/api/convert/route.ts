@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server"
 import { pdfConverter } from "@/lib/pdf/convert"
+import { cleanupOld } from "@/lib/cleanup"
 
 export async function POST(req: Request) {
+  cleanupOld() // 顺手清理超过 1 小时的旧文件
+
   try {
     const { r2Key } = await req.json()
 

@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server"
 import { mergePdfs } from "@/lib/pdf/merge"
+import { cleanupOld } from "@/lib/cleanup"
 
 export async function POST(req: Request) {
+  cleanupOld()
   try {
     const { r2Keys } = await req.json()
 

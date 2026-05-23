@@ -5,6 +5,7 @@ import { headers } from "next/headers"
 import { getUploadUrl } from "@/lib/r2"
 import { db } from "@/lib/db"
 import { checkRateLimit, apiError } from "@/lib/api-utils"
+import { cleanupOld } from "@/lib/cleanup"
 
 const UPLOAD_DIR = join(process.cwd(), ".data", "uploads")
 const MAX_FILE_SIZE = 100 * 1024 * 1024 // 100MB
@@ -25,6 +26,7 @@ function isPdfHeader(buf: Buffer): boolean {
 }
 
 export async function POST(req: Request) {
+  cleanupOld()
   try {
     // Rate limit: 20 uploads per minute per IP
     const ip = (await headers()).get("x-forwarded-for") || "unknown"

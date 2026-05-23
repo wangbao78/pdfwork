@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server"
 import { compressPdf, type CompressLevel } from "@/lib/pdf/compress"
+import { cleanupOld } from "@/lib/cleanup"
 
 export async function POST(req: Request) {
+  cleanupOld()
   try {
     const { r2Key, level } = await req.json()
 
