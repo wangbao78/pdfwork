@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { FileType, Combine, Shrink, Droplets, Scissors, Image, ArrowRight } from "lucide-react"
+import { FileType, Combine, Shrink, Droplets, Scissors, Image, ImageUp, Images, RotateCw, ArrowRight } from "lucide-react"
 
 const tools = [
   {
@@ -55,6 +55,33 @@ const tools = [
     gradient: "from-sky-500 to-indigo-500",
     bgLight: "bg-sky-50 dark:bg-sky-950",
     iconColor: "text-sky-600 dark:text-sky-400",
+  },
+  {
+    href: "/tools/image-to-pdf",
+    icon: ImageUp,
+    title: "图片转 PDF",
+    desc: "将多张图片合成为 PDF 文件，支持 JPG、PNG、WebP。",
+    gradient: "from-teal-500 to-emerald-500",
+    bgLight: "bg-teal-50 dark:bg-teal-950",
+    iconColor: "text-teal-600 dark:text-teal-400",
+  },
+  {
+    href: "/tools/pdf-to-jpg",
+    icon: Images,
+    title: "PDF 转 JPG",
+    desc: "将 PDF 每页转为 JPG 图片，200 DPI 清晰度。",
+    gradient: "from-cyan-500 to-blue-500",
+    bgLight: "bg-cyan-50 dark:bg-cyan-950",
+    iconColor: "text-cyan-600 dark:text-cyan-400",
+  },
+  {
+    href: "/tools/rotate-pdf",
+    icon: RotateCw,
+    title: "旋转 PDF",
+    desc: "将 PDF 所有页面按 90°/180°/270° 旋转。",
+    gradient: "from-fuchsia-500 to-purple-500",
+    bgLight: "bg-fuchsia-50 dark:bg-fuchsia-950",
+    iconColor: "text-fuchsia-600 dark:text-fuchsia-400",
   },
 ]
 
