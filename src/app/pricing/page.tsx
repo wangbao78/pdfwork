@@ -7,16 +7,17 @@ const plans = [
     price: "免费",
     period: "",
     features: [
-      { text: "每日 3 次处理", ok: true },
-      { text: "文件 ≤ 5MB", ok: true },
-      { text: "最多 50 页", ok: true },
+      { text: "文件 ≤ 10MB，50 页", ok: true },
       { text: "PDF 转 Word", ok: true },
       { text: "合并 PDF", ok: true },
-      { text: "压缩 PDF（标准）", ok: true },
+      { text: "压缩 PDF（标准 / 高）", ok: true },
+      { text: "PDF 加水印（文字）", ok: true },
+      { text: "拆分 PDF", ok: true },
+      { text: "提取图片", ok: true },
+      { text: "极限压缩", ok: false },
+      { text: "图片水印", ok: false },
       { text: "批量处理", ok: false },
       { text: "OCR 识别", ok: false },
-      { text: "优先处理队列", ok: false },
-      { text: "极限压缩", ok: false },
     ],
     cta: "当前套餐",
     ctaVariant: "outline" as const,
@@ -27,16 +28,17 @@ const plans = [
     period: "/月",
     featured: true,
     features: [
-      { text: "不限处理次数", ok: true },
-      { text: "文件 ≤ 100MB", ok: true },
-      { text: "最多 200 页", ok: true },
+      { text: "文件 ≤ 100MB，200 页", ok: true },
       { text: "PDF 转 Word", ok: true },
       { text: "合并 PDF", ok: true },
-      { text: "压缩 PDF（全部级别）", ok: true },
-      { text: "批量处理", ok: true },
-      { text: "OCR 识别", ok: true },
-      { text: "优先处理队列", ok: true },
+      { text: "压缩 PDF（含极限）", ok: true },
+      { text: "PDF 加水印（文字）", ok: true },
+      { text: "拆分 PDF", ok: true },
+      { text: "提取图片", ok: true },
       { text: "极限压缩", ok: true },
+      { text: "图片水印", ok: true },
+      { text: "批量处理", ok: true, soon: true },
+      { text: "OCR 识别", ok: true, soon: true },
     ],
     cta: "升级 Pro",
     ctaVariant: "default" as const,
@@ -74,7 +76,7 @@ export default function PricingPage() {
               <span className="text-muted-foreground">{plan.period}</span>
             </div>
             <ul className="mt-8 space-y-3">
-              {plan.features.map((f) => (
+              {plan.features.map((f: any) => (
                 <li key={f.text} className="flex items-center gap-3 text-sm">
                   {f.ok ? (
                     <Check className="h-4 w-4 text-emerald-500 shrink-0" />
@@ -84,6 +86,11 @@ export default function PricingPage() {
                   <span className={f.ok ? "" : "text-muted-foreground/50"}>
                     {f.text}
                   </span>
+                  {f.soon && (
+                    <span className="ml-auto rounded-full bg-amber-100 dark:bg-amber-900 px-2 py-0.5 text-[10px] text-amber-700 dark:text-amber-300">
+                      即将推出
+                    </span>
+                  )}
                 </li>
               ))}
             </ul>
