@@ -28,40 +28,56 @@ def main():
     total = len(doc)
     full_text = []
 
-    for page_num in range(total):
-        page = doc[page_num]
-        # Render page at 300 DPI for better OCR
-        pix = page.get_pixmap(dpi=300)
-        img_path = os.path.join(output_dir, f"page_{page_num+1}.png")
-        pix.save(img_path)
-
-        # OCR with Tesseract (Chinese simplified + English)
-        # Test PSM modes in order: 3=auto, 6=block, 4=single column
-        page_text = ""
+    def ocr_image(img_data, img_name):
+        """Run OCR on a single image bytes, return text"""
+        img_path = os.path.join(output_dir, img_name)
+        with open(img_path, "wb") as f:
+            f.write(img_data)
+        best = ""
         for psm in [3, 6, 4]:
-            txt_path = os.path.join(output_dir, f"page_{page_num+1}")
+            txt_path = os.path.join(output_dir, img_name.rsplit(".", 1)[0])
             result = subprocess.run([
                 "tesseract", img_path, txt_path,
                 "-l", "chi_sim+eng",
                 "--psm", str(psm),
             ], capture_output=True, timeout=120)
-
             if result.returncode != 0:
-                err = result.stderr.decode("utf-8", errors="ignore")[:200]
-                raise Exception(f"Tesseract error (page {page_num+1}, psm={psm}): {err}")
+                continue
+            tf = txt_path + ".txt"
+            if os.path.exists(tf):
+                with open(tf, "r", encoding="utf-8") as f:
+                    text = f.read().strip()
+                if len(text) > len(best):
+                    best = text
+        os.remove(img_path)
+        return best
 
-            txt_file = txt_path + ".txt"
-            if os.path.exists(txt_file):
-                with open(txt_file, "r", encoding="utf-8") as f:
-                    page_text = f.read().strip()
-            if page_text:
-                break  # Got text, done
+    for page_num in range(total):
+        page = doc[page_num]
+        images = page.get_images(full=True)
 
-        if not page_text:
-            continue  # 跳过空白页
-
-        full_text.append(page_text)
-        os.remove(img_path)  # Clean up image
+        if images:
+            # OCR each embedded image at native resolution
+            for img_idx, img_info in enumerate(images):
+                xref = img_info[0]
+                try:
+                    base = doc.extract_image(xref)
+                    img_data = base["image"]
+                    img_ext = base["ext"]
+                    img_name = f"page{page_num+1}_img{img_idx+1}.{img_ext}"
+                    text = ocr_image(img_data, img_name)
+                    if text:
+                        full_text.append(text)
+                except Exception:
+                    pass
+        else:
+            # No embedded images: OCR the whole page
+            pix = page.get_pixmap(dpi=300)
+            img_path = os.path.join(output_dir, f"page_{page_num+1}.png")
+            pix.save(img_path)
+            text = ocr_image(open(img_path, "rb").read(), f"page_{page_num+1}.png")
+            if text:
+                full_text.append(text)
 
     doc.close()
 
