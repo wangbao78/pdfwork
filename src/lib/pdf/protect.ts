@@ -1,4 +1,4 @@
-import { exec } from "child_process"
+import { execFile } from "child_process"
 import { promisify } from "util"
 import { readFile, writeFile, mkdir, unlink } from "fs/promises"
 import { tmpdir } from "os"
@@ -6,7 +6,7 @@ import { join, basename } from "path"
 import { getDownloadUrl, getUploadUrl } from "@/lib/r2"
 import type { ConversionResult } from "./types"
 
-const execP = promisify(exec)
+const execFileP = promisify(execFile)
 
 const isR2Configured =
   process.env.R2_ENDPOINT &&
@@ -18,12 +18,6 @@ const LOCAL_RESULTS = join(LOCAL_DIR, "results")
 function getFileBuf(r2Key: string): Promise<Buffer> {
   const fileId = r2Key.split("/")[1]
   return readFile(join(LOCAL_DIR, "uploads", fileId))
-}
-
-async function gsExec(args: string[]): Promise<void> {
-  const cmd = `gs -dBATCH -dNOPAUSE -dSAFER ${args.join(" ")}`
-  const { stderr } = await execP(cmd, { timeout: 120_000 })
-  if (stderr && stderr.includes("Error")) throw new Error(stderr)
 }
 
 export async function protectPdf(
@@ -46,7 +40,7 @@ export async function protectPdf(
       `-sOutputFile=${outputPath}`,
       inputPath,
     ]
-    await gsExec(args)
+    await execFileP("gs", ["-dBATCH", "-dNOPAUSE", "-dSAFER", ...args], { timeout: 120_000 })
 
     const resultBuf = await readFile(outputPath)
     const resultName = `protected-${inputName}`
@@ -83,7 +77,7 @@ export async function unlockPdf(
       `-sOutputFile=${outputPath}`,
       inputPath,
     ]
-    await gsExec(args)
+    await execFileP("gs", ["-dBATCH", "-dNOPAUSE", "-dSAFER", ...args], { timeout: 120_000 })
 
     const resultBuf = await readFile(outputPath)
     const resultName = `unlocked-${inputName}`
