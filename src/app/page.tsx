@@ -137,13 +137,13 @@ export default function Home() {
     <>
       <section className="mx-auto w-full max-w-5xl px-4 pt-16 pb-10 text-center">
         <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">PDF 工具箱</h1>
-        <p className="mt-3 text-muted-foreground">18 个工具，免费在线处理 PDF — 转换、编辑、优化、标记</p>
+        <p className="mt-3 text-muted-foreground">11 个免费工具 + 7 个 Pro 工具，在线处理 PDF</p>
         <div className="mt-4 flex items-center justify-center gap-6 text-xs text-muted-foreground">
           <span>文件 ≤ 10MB</span>
           <span className="h-1 w-1 rounded-full bg-muted-foreground/30" />
-          <span>最多 50 页</span>
+          <span>最多 20 页</span>
           <span className="h-1 w-1 rounded-full bg-muted-foreground/30" />
-          <span>全部基础工具免费</span>
+          <span>游客每日 3 次</span>
           <span className="h-1 w-1 rounded-full bg-muted-foreground/30" />
           <Link href="/pricing" className="text-primary hover:underline font-medium">Pro 更多 →</Link>
         </div>

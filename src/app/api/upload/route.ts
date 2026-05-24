@@ -6,6 +6,7 @@ import { getUploadUrl } from "@/lib/r2"
 import { db } from "@/lib/db"
 import { checkRateLimit, apiError } from "@/lib/api-utils"
 import { cleanupOld } from "@/lib/cleanup"
+import { getAccessUser, checkQuota, checkGuestQuota } from "@/lib/access"
 
 const UPLOAD_DIR = join(process.cwd(), ".data", "uploads")
 const MAX_FILE_SIZE = 100 * 1024 * 1024 // 100MB
@@ -20,7 +21,6 @@ function cuid(): string {
   return `${t}${r()}${r()}`
 }
 
-/** Validate PDF header magic bytes */
 function isPdfHeader(buf: Buffer): boolean {
   return buf.length >= 4 && buf[0] === 0x25 && buf[1] === 0x50 && buf[2] === 0x44 && buf[3] === 0x46
 }
@@ -32,6 +32,16 @@ export async function POST(req: Request) {
     const ip = (await headers()).get("x-forwarded-for") || "unknown"
     if (!checkRateLimit(`upload:${ip}`, 20, 60_000)) {
       return apiError("请求过于频繁，请稍后再试", 429)
+    }
+
+    // 限额检查
+    const user = await getAccessUser()
+    if (user.isGuest) {
+      const guestErr = checkGuestQuota(ip)
+      if (guestErr) return apiError(guestErr, 429)
+    } else {
+      const quotaErr = await checkQuota(user, 0, 0)
+      if (quotaErr) return apiError(quotaErr, 429)
     }
 
     // Local mode: accept file directly via multipart

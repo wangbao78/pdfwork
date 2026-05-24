@@ -1,8 +1,11 @@
 import { NextResponse } from "next/server"
 import { htmlToPdf } from "@/lib/pdf/html-to-pdf"
 import { cleanupOld } from "@/lib/cleanup"
+import { requirePro, trackUsage, getAccessUser } from "@/lib/access"
 
 export async function POST(req: Request) {
+  const block = await requirePro(req)
+  if (block) return block
   cleanupOld()
 
   try {
@@ -16,6 +19,9 @@ export async function POST(req: Request) {
     }
 
     const downloadUrl = await htmlToPdf(html.trim())
+
+    const user = await getAccessUser()
+    trackUsage(user)
 
     return NextResponse.json({ downloadUrl })
   } catch (e) {

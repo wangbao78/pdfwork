@@ -3,10 +3,13 @@ import { writeFile, mkdir } from "fs/promises"
 import { join } from "path"
 import { officeToPdf } from "@/lib/pdf/office-to-pdf"
 import { cleanupOld } from "@/lib/cleanup"
+import { requirePro, trackUsage, getAccessUser } from "@/lib/access"
 
 const UPLOAD_DIR = join(process.cwd(), ".data", "office-uploads")
 
 export async function POST(req: Request) {
+  const block = await requirePro(req)
+  if (block) return block
   cleanupOld()
 
   try {

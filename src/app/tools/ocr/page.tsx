@@ -6,10 +6,12 @@ import { ToolLayout } from "@/components/shared/ToolLayout"
 import { DownloadButton } from "@/components/shared/DownloadButton"
 import { Button } from "@/components/ui/button"
 import { Loader2, ScanText } from "lucide-react"
+import { UpgradePrompt, useCanUsePro } from "@/components/shared/UpgradePrompt"
 
 type Step = "upload" | "uploading" | "ready" | "processing" | "done"
 
 export default function OcrPage() {
+  const { canUse } = useCanUsePro()
   const [step, setStep] = useState<Step>("upload")
   const [file, setFile] = useState<File | null>(null)
   const [r2Key, setR2Key] = useState<string | null>(null)
@@ -54,6 +56,14 @@ export default function OcrPage() {
   }
 
   const reset = () => { setFile(null); setR2Key(null); setDownloadUrl(null); setPreviewText(""); setError(null); setStep("upload") }
+
+  if (!canUse) {
+    return (
+      <ToolLayout title="OCR 识别" description="从扫描件或图片 PDF 中识别文字，输出为 Word 文档。">
+        <UpgradePrompt tool="OCR 识别" />
+      </ToolLayout>
+    )
+  }
 
   return (
     <ToolLayout

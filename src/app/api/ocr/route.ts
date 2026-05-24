@@ -1,8 +1,11 @@
 import { NextResponse } from "next/server"
 import { ocrPdf } from "@/lib/pdf/ocr"
 import { cleanupOld } from "@/lib/cleanup"
+import { requirePro, trackUsage, getAccessUser } from "@/lib/access"
 
 export async function POST(req: Request) {
+  const block = await requirePro(req)
+  if (block) return block
   cleanupOld()
 
   try {
@@ -18,6 +21,7 @@ export async function POST(req: Request) {
 
     const result = await ocrPdf(r2Key)
 
+    trackUsage(await getAccessUser())
     return NextResponse.json(result)
   } catch (e) {
     const message = e instanceof Error ? e.message : "OCR 识别失败"

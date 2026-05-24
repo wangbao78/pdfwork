@@ -1,15 +1,18 @@
 "use client"
 
 import { useState } from "react"
+import { useSession } from "next-auth/react"
 import { ToolLayout } from "@/components/shared/ToolLayout"
 import { DownloadButton } from "@/components/shared/DownloadButton"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Loader2, FileText } from "lucide-react"
+import { UpgradePrompt, useCanUsePro } from "@/components/shared/UpgradePrompt"
 
 type Step = "select" | "uploading" | "processing" | "done"
 
 export default function OfficeToPdfPage() {
+  const { canUse } = useCanUsePro()
   const [step, setStep] = useState<Step>("select")
   const [file, setFile] = useState<File | null>(null)
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null)
@@ -37,6 +40,14 @@ export default function OfficeToPdfPage() {
       setError(e instanceof Error ? e.message : "转换失败")
       setStep("select")
     }
+  }
+
+  if (!canUse) {
+    return (
+      <ToolLayout title="Office 转 PDF" description="将 Word、Excel、PPT 文件转换为 PDF。">
+        <UpgradePrompt tool="Office 转 PDF" />
+      </ToolLayout>
+    )
   }
 
   return (

@@ -1,8 +1,11 @@
 import { NextResponse } from "next/server"
 import { protectPdf, unlockPdf } from "@/lib/pdf/protect"
 import { cleanupOld } from "@/lib/cleanup"
+import { requirePro, trackUsage, getAccessUser } from "@/lib/access"
 
 export async function POST(req: Request) {
+  const block = await requirePro(req)
+  if (block) return block
   cleanupOld()
 
   try {
@@ -15,9 +18,12 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "密码长度 2-32 位" }, { status: 400 })
     }
 
+    const user = await getAccessUser()
+
     if (action === "unlock") {
       try {
         const result = await unlockPdf(r2Key, password)
+        trackUsage(user)
         return NextResponse.json(result)
       } catch {
         return NextResponse.json({ error: "密码错误或文件未加密" }, { status: 400 })
@@ -25,6 +31,7 @@ export async function POST(req: Request) {
     }
 
     const result = await protectPdf(r2Key, password)
+    trackUsage(user)
     return NextResponse.json(result)
   } catch (e) {
     const message = e instanceof Error ? e.message : "处理失败"

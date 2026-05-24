@@ -1,8 +1,11 @@
 import { NextResponse } from "next/server"
 import { batchProcess, type BatchOptions } from "@/lib/pdf/batch"
 import { cleanupOld } from "@/lib/cleanup"
+import { requirePro, trackUsage, getAccessUser } from "@/lib/access"
 
 export async function POST(req: Request) {
+  const block = await requirePro(req)
+  if (block) return block
   cleanupOld()
 
   try {
@@ -24,6 +27,7 @@ export async function POST(req: Request) {
       compressLevel: compressLevel === "high" ? "high" : "standard",
     })
 
+    trackUsage(await getAccessUser())
     return NextResponse.json(result)
   } catch (e) {
     const message = e instanceof Error ? e.message : "批量处理失败"

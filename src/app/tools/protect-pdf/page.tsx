@@ -8,11 +8,13 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Loader2, Lock, LockOpen } from "lucide-react"
+import { UpgradePrompt, useCanUsePro } from "@/components/shared/UpgradePrompt"
 
 type Step = "upload" | "uploading" | "ready" | "processing" | "done"
 type Mode = "protect" | "unlock"
 
 export default function ProtectPdfPage() {
+  const { canUse } = useCanUsePro()
   const [step, setStep] = useState<Step>("upload")
   const [mode, setMode] = useState<Mode>("protect")
   const [file, setFile] = useState<File | null>(null)
@@ -76,6 +78,14 @@ export default function ProtectPdfPage() {
     setDownloadUrl(null)
     setError(null)
     setStep("upload")
+  }
+
+  if (!canUse) {
+    return (
+      <ToolLayout title="PDF 加密 / 解锁" description="给 PDF 添加打开密码，或输入密码解除保护。">
+        <UpgradePrompt tool="PDF 加密 / 解锁" />
+      </ToolLayout>
+    )
   }
 
   return (

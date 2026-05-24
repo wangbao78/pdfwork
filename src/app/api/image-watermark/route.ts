@@ -1,8 +1,11 @@
 import { NextResponse } from "next/server"
 import { imageWatermarkPdf } from "@/lib/pdf/image-watermark"
 import { cleanupOld } from "@/lib/cleanup"
+import { requirePro, trackUsage, getAccessUser } from "@/lib/access"
 
 export async function POST(req: Request) {
+  const block = await requirePro(req)
+  if (block) return block
   cleanupOld()
 
   try {
@@ -25,6 +28,7 @@ export async function POST(req: Request) {
       scale: Number(formData.get("scale")) || 0.25,
     })
 
+    trackUsage(await getAccessUser())
     return NextResponse.json({ downloadUrl })
   } catch (e) {
     const message = e instanceof Error ? e.message : "水印添加失败"

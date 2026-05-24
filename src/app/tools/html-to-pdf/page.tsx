@@ -6,6 +6,7 @@ import { DownloadButton } from "@/components/shared/DownloadButton"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Loader2, Code2 } from "lucide-react"
+import { UpgradePrompt, useCanUsePro } from "@/components/shared/UpgradePrompt"
 
 type Step = "edit" | "processing" | "done"
 
@@ -17,6 +18,7 @@ const SAMPLE = `<h1>Hello World</h1>
 </table>`
 
 export default function HtmlToPdfPage() {
+  const { canUse } = useCanUsePro()
   const [step, setStep] = useState<Step>("edit")
   const [html, setHtml] = useState(SAMPLE)
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null)
@@ -39,6 +41,14 @@ export default function HtmlToPdfPage() {
       setError(e instanceof Error ? e.message : "转换失败")
       setStep("edit")
     }
+  }
+
+  if (!canUse) {
+    return (
+      <ToolLayout title="HTML 转 PDF" description="将 HTML 内容转换为 PDF 文件。">
+        <UpgradePrompt tool="HTML 转 PDF" />
+      </ToolLayout>
+    )
   }
 
   return (

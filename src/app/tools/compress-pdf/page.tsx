@@ -14,6 +14,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Loader2 } from "lucide-react"
+import { UpgradePrompt, useCanUsePro } from "@/components/shared/UpgradePrompt"
 
 type CompressLevel = "standard" | "high" | "extreme"
 type Step = "upload" | "uploading" | "ready" | "processing" | "done"
@@ -25,6 +26,7 @@ const LEVEL_LABELS: Record<CompressLevel, string> = {
 }
 
 export default function CompressPdfPage() {
+  const { canUse } = useCanUsePro()
   const [step, setStep] = useState<Step>("upload")
   const [file, setFile] = useState<File | null>(null)
   const [r2Key, setR2Key] = useState<string | null>(null)
@@ -63,6 +65,10 @@ export default function CompressPdfPage() {
 
   const handleCompress = async () => {
     if (!r2Key) return
+    if (level === "extreme" && !canUse) {
+      setError("极限压缩为 Pro 专享功能，请升级后使用")
+      return
+    }
     setStep("processing")
     setError(null)
 

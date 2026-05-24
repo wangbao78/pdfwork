@@ -8,10 +8,12 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Loader2, Image } from "lucide-react"
+import { UpgradePrompt, useCanUsePro } from "@/components/shared/UpgradePrompt"
 
 type Step = "upload" | "uploading" | "wm_select" | "ready" | "processing" | "done"
 
 export default function ImageWatermarkPage() {
+  const { canUse } = useCanUsePro()
   const [step, setStep] = useState<Step>("upload")
   const [file, setFile] = useState<File | null>(null)
   const [r2Key, setR2Key] = useState<string | null>(null)
@@ -69,6 +71,14 @@ export default function ImageWatermarkPage() {
   const reset = () => {
     setFile(null); setR2Key(null); setWmFile(null); setWmPreview("")
     setDownloadUrl(null); setError(null); setStep("upload")
+  }
+
+  if (!canUse) {
+    return (
+      <ToolLayout title="图片水印" description="上传图片作为水印叠加到 PDF 中心位置。">
+        <UpgradePrompt tool="图片水印" />
+      </ToolLayout>
+    )
   }
 
   return (

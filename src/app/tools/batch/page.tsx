@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Loader2, Plus, X } from "lucide-react"
+import { UpgradePrompt, useCanUsePro } from "@/components/shared/UpgradePrompt"
 
 type Step = "select" | "uploading" | "ready" | "processing" | "done"
 
@@ -17,6 +18,7 @@ const OPS = [
 ]
 
 export default function BatchPage() {
+  const { canUse } = useCanUsePro()
   const [step, setStep] = useState<Step>("select")
   const [files, setFiles] = useState<{ file: File; r2Key?: string }[]>([])
   const [operation, setOperation] = useState("convert")
@@ -80,6 +82,14 @@ export default function BatchPage() {
   const reset = () => {
     setFiles([]); setDownloadUrl(null); setError(null)
     setStep("select"); setStats({ total: 0, ok: 0, failed: 0 })
+  }
+
+  if (!canUse) {
+    return (
+      <ToolLayout title="批量处理" description="一次上传多个 PDF，统一操作，结果打包下载。">
+        <UpgradePrompt tool="批量处理" />
+      </ToolLayout>
+    )
   }
 
   return (
