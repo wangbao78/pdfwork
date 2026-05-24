@@ -10,4 +10,6 @@
  */
 export type * from './models/User'
 export type * from './models/File'
+export type * from './models/GuestUsage'
+export type * from './models/ProTrial'
 export type * from './commonInputTypes'

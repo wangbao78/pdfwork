@@ -51,3 +51,13 @@ export type User = Prisma.UserModel
  * 
  */
 export type File = Prisma.FileModel
+/**
+ * Model GuestUsage
+ * 
+ */
+export type GuestUsage = Prisma.GuestUsageModel
+/**
+ * Model ProTrial
+ * 
+ */
+export type ProTrial = Prisma.ProTrialModel

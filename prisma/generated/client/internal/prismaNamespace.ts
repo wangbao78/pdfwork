@@ -385,7 +385,9 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 
 export const ModelName = {
   User: 'User',
-  File: 'File'
+  File: 'File',
+  GuestUsage: 'GuestUsage',
+  ProTrial: 'ProTrial'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -401,7 +403,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "file"
+    modelProps: "user" | "file" | "guestUsage" | "proTrial"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -553,6 +555,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    GuestUsage: {
+      payload: Prisma.$GuestUsagePayload<ExtArgs>
+      fields: Prisma.GuestUsageFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.GuestUsageFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GuestUsagePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.GuestUsageFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GuestUsagePayload>
+        }
+        findFirst: {
+          args: Prisma.GuestUsageFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GuestUsagePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.GuestUsageFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GuestUsagePayload>
+        }
+        findMany: {
+          args: Prisma.GuestUsageFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GuestUsagePayload>[]
+        }
+        create: {
+          args: Prisma.GuestUsageCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GuestUsagePayload>
+        }
+        createMany: {
+          args: Prisma.GuestUsageCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.GuestUsageCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GuestUsagePayload>[]
+        }
+        delete: {
+          args: Prisma.GuestUsageDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GuestUsagePayload>
+        }
+        update: {
+          args: Prisma.GuestUsageUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GuestUsagePayload>
+        }
+        deleteMany: {
+          args: Prisma.GuestUsageDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.GuestUsageUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.GuestUsageUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GuestUsagePayload>[]
+        }
+        upsert: {
+          args: Prisma.GuestUsageUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GuestUsagePayload>
+        }
+        aggregate: {
+          args: Prisma.GuestUsageAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateGuestUsage>
+        }
+        groupBy: {
+          args: Prisma.GuestUsageGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.GuestUsageGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.GuestUsageCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.GuestUsageCountAggregateOutputType> | number
+        }
+      }
+    }
+    ProTrial: {
+      payload: Prisma.$ProTrialPayload<ExtArgs>
+      fields: Prisma.ProTrialFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ProTrialFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProTrialPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ProTrialFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProTrialPayload>
+        }
+        findFirst: {
+          args: Prisma.ProTrialFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProTrialPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ProTrialFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProTrialPayload>
+        }
+        findMany: {
+          args: Prisma.ProTrialFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProTrialPayload>[]
+        }
+        create: {
+          args: Prisma.ProTrialCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProTrialPayload>
+        }
+        createMany: {
+          args: Prisma.ProTrialCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ProTrialCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProTrialPayload>[]
+        }
+        delete: {
+          args: Prisma.ProTrialDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProTrialPayload>
+        }
+        update: {
+          args: Prisma.ProTrialUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProTrialPayload>
+        }
+        deleteMany: {
+          args: Prisma.ProTrialDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ProTrialUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ProTrialUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProTrialPayload>[]
+        }
+        upsert: {
+          args: Prisma.ProTrialUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProTrialPayload>
+        }
+        aggregate: {
+          args: Prisma.ProTrialAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateProTrial>
+        }
+        groupBy: {
+          args: Prisma.ProTrialGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ProTrialGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ProTrialCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ProTrialCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -628,6 +778,27 @@ export const FileScalarFieldEnum = {
 } as const
 
 export type FileScalarFieldEnum = (typeof FileScalarFieldEnum)[keyof typeof FileScalarFieldEnum]
+
+
+export const GuestUsageScalarFieldEnum = {
+  id: 'id',
+  ip: 'ip',
+  date: 'date',
+  count: 'count'
+} as const
+
+export type GuestUsageScalarFieldEnum = (typeof GuestUsageScalarFieldEnum)[keyof typeof GuestUsageScalarFieldEnum]
+
+
+export const ProTrialScalarFieldEnum = {
+  id: 'id',
+  key: 'key',
+  date: 'date',
+  tool: 'tool',
+  count: 'count'
+} as const
+
+export type ProTrialScalarFieldEnum = (typeof ProTrialScalarFieldEnum)[keyof typeof ProTrialScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -855,6 +1026,8 @@ export type PrismaClientOptions = ({
 export type GlobalOmitConfig = {
   user?: Prisma.UserOmit
   file?: Prisma.FileOmit
+  guestUsage?: Prisma.GuestUsageOmit
+  proTrial?: Prisma.ProTrialOmit
 }
 
 /* Types for Logging */

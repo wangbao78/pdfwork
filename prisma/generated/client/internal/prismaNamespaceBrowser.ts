@@ -52,7 +52,9 @@ export const AnyNull = runtime.AnyNull
 
 export const ModelName = {
   User: 'User',
-  File: 'File'
+  File: 'File',
+  GuestUsage: 'GuestUsage',
+  ProTrial: 'ProTrial'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -107,6 +109,27 @@ export const FileScalarFieldEnum = {
 } as const
 
 export type FileScalarFieldEnum = (typeof FileScalarFieldEnum)[keyof typeof FileScalarFieldEnum]
+
+
+export const GuestUsageScalarFieldEnum = {
+  id: 'id',
+  ip: 'ip',
+  date: 'date',
+  count: 'count'
+} as const
+
+export type GuestUsageScalarFieldEnum = (typeof GuestUsageScalarFieldEnum)[keyof typeof GuestUsageScalarFieldEnum]
+
+
+export const ProTrialScalarFieldEnum = {
+  id: 'id',
+  key: 'key',
+  date: 'date',
+  tool: 'tool',
+  count: 'count'
+} as const
+
+export type ProTrialScalarFieldEnum = (typeof ProTrialScalarFieldEnum)[keyof typeof ProTrialScalarFieldEnum]
 
 
 export const SortOrder = {
