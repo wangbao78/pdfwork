@@ -22,16 +22,31 @@ export PATH="/d/nodejs:$PATH"
 # Bash CWD 默认 d:/vscode，操作 pdfwork 需先 cd
 cd /d/vscode/pdfwork
 
-# 构建
+# 构建（必须在 pdfwork 目录下执行）
 npm run build
+# 或完整命令：
+cd /d/vscode/pdfwork && export PATH="/d/nodejs:$PATH" && npx next build
 
-# Railway 部署（链接经常丢失，需先 link）
-npx railway link --project 7cc33422-8eb2-4da3-9305-7899009fb2bc --environment production --service api
+# Railway 部署
 npx railway up --service api
+
+# 查看 Railway 部署状态
+npx railway deployment list --service api
 
 # 查看 Railway 变量
 npx railway variables --service api
+
+# 设置 Railway 变量（设置后自动触发重部署）
+npx railway variables set KEY=VALUE --service api
 ```
+
+### 构建/部署注意事项
+
+- **CWD**：bash 默认在 `d:/vscode`，所有命令必须先 `cd /d/vscode/pdfwork`
+- **`.dockerignore`**：排除 node_modules / .next / .data / .git，否则 Railway 上传 4GB+ 触发 413
+- **Dockerfile 构建顺序**：`prisma generate` 必须在 `npm run build` 之前（如果改了 schema），且要设 `DATABASE_URL=postgresql://dummy` 占位
+- **改 Prisma schema** 后需本地 `npx prisma generate` 重新生成客户端
+- **服务端动态页面**：DB 查询的 page 需要 `export const dynamic = "force-dynamic"`，否则构建时查 DB 会失败
 
 ## 功能清单（18 个工具）
 
