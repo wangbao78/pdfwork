@@ -34,7 +34,7 @@ def main():
         with open(img_path, "wb") as f:
             f.write(img_data)
         best = ""
-        for psm in [3, 6, 4]:
+        for psm in [3, 6, 11, 4]:
             txt_path = os.path.join(output_dir, img_name.rsplit(".", 1)[0])
             result = subprocess.run([
                 "tesseract", img_path, txt_path,
