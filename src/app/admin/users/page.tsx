@@ -68,7 +68,14 @@ export default async function AdminUsersPage({
             <tbody>
               {users.map((u) => (
                 <tr key={u.id} className="border-b last:border-0 hover:bg-muted/30 transition-colors">
-                  <td className="px-4 py-3 font-medium">{u.email}</td>
+                  <td className="px-4 py-3 font-medium">
+                    <Link
+                      href={`/admin/users/${u.id}`}
+                      className="text-primary hover:underline"
+                    >
+                      {u.email}
+                    </Link>
+                  </td>
                   <td className="px-4 py-3 text-muted-foreground hidden md:table-cell">
                     {u.name || "-"}
                   </td>

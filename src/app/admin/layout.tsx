@@ -45,6 +45,9 @@ export default async function AdminLayout({
               <Link href="/admin/users" className="text-muted-foreground hover:text-foreground transition-colors">
                 用户
               </Link>
+              <Link href="/admin/logs" className="text-muted-foreground hover:text-foreground transition-colors">
+                日志
+              </Link>
             </nav>
           </div>
           <div className="flex items-center gap-3 text-sm text-muted-foreground">
