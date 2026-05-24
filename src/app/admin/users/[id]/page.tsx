@@ -168,7 +168,7 @@ export default async function AdminUserDetailPage({
                         {f.name}
                       </td>
                       <td className="px-4 py-3 text-muted-foreground hidden sm:table-cell">
-                        {f.tool || "-"}
+                        {f.tool || (f.status === "PENDING" ? "待处理" : "-")}
                       </td>
                       <td className="px-4 py-3 text-right tabular-nums">
                         {formatSize(f.size)}

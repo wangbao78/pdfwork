@@ -25,11 +25,39 @@ function isPdfHeader(buf: Buffer): boolean {
   return buf.length >= 4 && buf[0] === 0x25 && buf[1] === 0x50 && buf[2] === 0x44 && buf[3] === 0x46
 }
 
+const TOOL_BY_PATH: Record<string, string> = {
+  "pdf-to-word": "PDF 转 Word",
+  "pdf-to-jpg": "PDF 转 JPG",
+  "extract-images": "提取图片",
+  "image-to-pdf": "图片转 PDF",
+  "merge-pdf": "合并 PDF",
+  "split-pdf": "拆分 PDF",
+  "rotate-pdf": "旋转 PDF",
+  "reorder-pdf": "页面排序",
+  "compress-pdf": "压缩 PDF",
+  watermark: "文字水印",
+  "page-number": "PDF 页码",
+  "image-watermark": "图片水印",
+  ocr: "OCR 识别",
+  "protect-pdf": "加密/解锁",
+  batch: "批量处理",
+}
+
+function detectTool(req: Request): string | null {
+  try {
+    const ref = req.headers.get("referer") || ""
+    const match = ref.match(/\/tools\/([^/?]+)/)
+    if (match) return TOOL_BY_PATH[match[1]] || null
+  } catch {}
+  return null
+}
+
 export async function POST(req: Request) {
   cleanupOld()
   try {
     // Rate limit: 20 uploads per minute per IP
     const ip = (await headers()).get("x-forwarded-for") || "unknown"
+    const tool = detectTool(req)
     if (!checkRateLimit(`upload:${ip}`, 20, 60_000)) {
       return apiError("请求过于频繁，请稍后再试", 429)
     }
@@ -73,6 +101,7 @@ export async function POST(req: Request) {
             type: "application/pdf",
             status: "PENDING",
             r2Key,
+            tool,
             ip,
             userId: user.id || null,
             expiresAt: new Date(Date.now() + 3600 * 1000),
@@ -104,6 +133,7 @@ export async function POST(req: Request) {
           type: "application/pdf",
           status: "PENDING",
           r2Key,
+          tool,
           ip,
           userId: user.id || null,
           expiresAt: new Date(Date.now() + 3600 * 1000),

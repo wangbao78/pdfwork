@@ -162,7 +162,7 @@ export function LogsTable({ files, total, page, totalPages, navLinks }: Props) {
                     {f.name}
                   </td>
                   <td className="px-4 py-3 text-muted-foreground">
-                    {f.tool || "-"}
+                    {f.tool || (f.status === "PENDING" ? "待处理" : "-")}
                   </td>
                   <td className="px-4 py-3 text-right tabular-nums hidden sm:table-cell">
                     {formatSize(f.size)}
