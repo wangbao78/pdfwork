@@ -25,8 +25,9 @@ const PRO_MAX_PAGES = 200
 const FREE_MAX_SIZE = 10 * 1024 * 1024  // 10MB
 const PRO_MAX_SIZE = 100 * 1024 * 1024  // 100MB
 
-// 文件计数器
+// JSON 文件回退路径
 const COUNTER_PATH = join(process.cwd(), ".data", "guest_counters.json")
+const TRIAL_PATH = join(process.cwd(), ".data", "pro_trials.json")
 const USER_COUNTER_PATH = join(process.cwd(), ".data", "user_counters.json")
 
 function today(): string {
@@ -55,14 +56,57 @@ export async function getAccessUser(): Promise<AccessUser> {
   return { plan: "FREE", isGuest: true }
 }
 
-/** 检查是否有权使用 Pro 工具，返回 null 表示通过，返回字符串为错误信息 */
-export function checkProTool(
+/** 检查 Pro 工具试用权限。游客/Free 每日每工具 1 次试用，返回 null 通过 */
+export async function checkProTool(
   user: AccessUser,
-  _tool: string,
-): string | null {
+  tool: string,
+  ip: string,
+): Promise<string | null> {
   if (!QUOTA_ENABLED) return null
-  if (user.isGuest) return "请先登录后使用此功能"
-  if (user.plan === "FREE") return "此功能为 Pro 专享，请升级后使用"
+  if (user.plan === "PRO") return null
+
+  const key = user.isGuest ? `guest:${ip}` : user.id!
+  const td = today()
+
+  // Try DB first
+  try {
+    const record = await db.proTrial.findUnique({
+      where: { key_date_tool: { key, date: td, tool } },
+    })
+    if (record && record.count >= 1) {
+      return user.isGuest
+        ? "今日试用次数已用完，请登录后升级 Pro"
+        : "今日试用次数已用完，请升级 Pro 无限使用"
+    }
+    if (record) {
+      await db.proTrial.update({ where: { id: record.id }, data: { count: record.count + 1 } })
+    } else {
+      await db.proTrial.create({ data: { key, date: td, tool, count: 1 } })
+    }
+    return null
+  } catch {
+    // DB 不可用，回退到 JSON 文件
+  }
+
+  let trials: Record<string, Record<string, number>> = {}
+  try {
+    const raw = await readFile(TRIAL_PATH, "utf-8")
+    trials = JSON.parse(raw)
+  } catch {}
+
+  const userTrials = trials[`${key}:${td}`] || {}
+
+  if ((userTrials[tool] || 0) >= 1) {
+    return user.isGuest
+      ? "今日试用次数已用完，请登录后升级 Pro"
+      : "今日试用次数已用完，请升级 Pro 无限使用"
+  }
+
+  userTrials[tool] = (userTrials[tool] || 0) + 1
+  trials[`${key}:${td}`] = userTrials
+  await mkdir(join(TRIAL_PATH, ".."), { recursive: true })
+  await writeFile(TRIAL_PATH, JSON.stringify(trials), "utf-8")
+
   return null
 }
 
@@ -73,19 +117,16 @@ export async function checkQuota(
   pageCount: number,
 ): Promise<string | null> {
   if (!QUOTA_ENABLED) return null
-  // Pro 不限
   if (user.plan === "PRO") return null
 
-  // 游客按 IP
+  // 游客按 IP（配额检查在 checkGuestQuota 中完成，这里只做文件大小和页数）
   if (user.isGuest) {
-    // 大小检查
     if (fileSize > FREE_MAX_SIZE) {
       return `文件大小超过 10MB 限制，登录后可提升至 100MB`
     }
     if (pageCount > GUEST_MAX_PAGES) {
       return `文件页数超过 ${GUEST_MAX_PAGES} 页限制，登录后可提升至 ${FREE_MAX_PAGES} 页`
     }
-    // 次数检查（需要从请求上下文拿 IP，这里返回 null 在 API 层再查）
     return null
   }
 
@@ -97,7 +138,6 @@ export async function checkQuota(
     return `文件页数超过 ${FREE_MAX_PAGES} 页限制，升级 Pro 可处理 ${PRO_MAX_PAGES} 页`
   }
 
-  // 检查每日次数
   try {
     const dbUser = await db.user.findUnique({ where: { id: user.id! } })
     if (!dbUser) return null
@@ -163,11 +203,30 @@ export async function trackUsage(user: AccessUser): Promise<void> {
   }
 }
 
-/** 游客 IP 次数检查（文件持久化，重启不丢） */
+/** 游客 IP 次数检查（DB 优先，JSON 兜底） */
 export async function checkGuestQuota(ip: string): Promise<string | null> {
   if (!QUOTA_ENABLED) return null
 
-  // 读取计数器
+  const td = today()
+
+  // Try DB first
+  try {
+    let record = await db.guestUsage.findUnique({
+      where: { ip_date: { ip, date: td } },
+    })
+    if (!record) {
+      await db.guestUsage.create({ data: { ip, date: td, count: 1 } })
+      return null
+    }
+    await db.guestUsage.update({ where: { id: record.id }, data: { count: record.count + 1 } })
+    if (record.count >= GUEST_DAILY) {
+      return `今日免费次数已用完（${GUEST_DAILY} 次），请登录后继续使用`
+    }
+    return null
+  } catch {
+    // DB 不可用，回退到 JSON 文件
+  }
+
   let counters: Record<string, { count: number; date: string }> = {}
   try {
     const raw = await readFile(COUNTER_PATH, "utf-8")
@@ -177,8 +236,8 @@ export async function checkGuestQuota(ip: string): Promise<string | null> {
   const key = `guest:${ip}`
   const record = counters[key]
 
-  if (!record || record.date !== today()) {
-    counters[key] = { count: 1, date: today() }
+  if (!record || record.date !== td) {
+    counters[key] = { count: 1, date: td }
     await mkdir(join(COUNTER_PATH, ".."), { recursive: true })
     await writeFile(COUNTER_PATH, JSON.stringify(counters), "utf-8")
     return null
@@ -195,14 +254,24 @@ export async function checkGuestQuota(ip: string): Promise<string | null> {
   return null
 }
 
-/** API 路由中快速校验 Pro 权限，返回 null 通过，返回 Response 则直接返回错误 */
+/** API 路由中快速校验 Pro 试用权限，返回 null 通过 */
 export async function requirePro(req: Request): Promise<Response | null> {
   const user = await getAccessUser()
   const url = new URL(req.url)
-  const tool = url.pathname.split("/api/")[1] || ""
-  const err = checkProTool(user, tool)
-  if (err) return Response.json({ error: err }, { status: err.includes("登录") ? 401 : 403 })
+  const tool = url.pathname.split("/api/")[1]?.replace(/-/g, "_") || ""
+  const ip = req.headers.get("x-forwarded-for") || "unknown"
+  const err = await checkProTool(user, tool, ip)
+  if (err) return Response.json({ error: err, trial: true }, { status: 403 })
   return null
 }
 
-export { PRO_TOOLS, FREE_MAX_SIZE }
+export {
+  PRO_TOOLS,
+  FREE_MAX_SIZE,
+  GUEST_DAILY,
+  FREE_DAILY,
+  GUEST_MAX_PAGES,
+  FREE_MAX_PAGES,
+  PRO_MAX_PAGES,
+  PRO_MAX_SIZE,
+}
