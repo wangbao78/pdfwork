@@ -51,6 +51,11 @@ const convertTools: Tool[] = [
     title: "批量处理", desc: "一次上传多个 PDF，统一操作打包下载。",
     bgLight: "bg-gray-50 dark:bg-gray-900", iconColor: "text-gray-600 dark:text-gray-400",
   },
+  {
+    href: "/tools/ocr", icon: ScanText,
+    title: "OCR 识别", desc: "扫描件或图片 PDF 识别为可编辑 Word。",
+    bgLight: "bg-stone-50 dark:bg-stone-900", iconColor: "text-stone-600 dark:text-stone-400",
+  },
 ]
 
 const editTools: Tool[] = [
@@ -104,15 +109,6 @@ const optimizeTools: Tool[] = [
   },
 ]
 
-const advancedTools: Tool[] = [
-  {
-    href: "/pricing", icon: ScanText,
-    title: "OCR 识别", desc: "扫描件中的文字转为可编辑文本。",
-    bgLight: "bg-slate-100 dark:bg-slate-800", iconColor: "text-slate-400 dark:text-slate-500",
-    soon: true,
-  },
-]
-
 function ToolCard({ tool }: { tool: Tool }) {
   const Icon = tool.icon
   return (
@@ -141,7 +137,7 @@ export default function Home() {
     <>
       <section className="mx-auto w-full max-w-5xl px-4 pt-16 pb-10 text-center">
         <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">PDF 工具箱</h1>
-        <p className="mt-3 text-muted-foreground">17 个工具，免费在线处理 PDF — 转换、编辑、优化、标记</p>
+        <p className="mt-3 text-muted-foreground">18 个工具，免费在线处理 PDF — 转换、编辑、优化、标记</p>
         <div className="mt-4 flex items-center justify-center gap-6 text-xs text-muted-foreground">
           <span>文件 ≤ 10MB</span>
           <span className="h-1 w-1 rounded-full bg-muted-foreground/30" />
@@ -184,16 +180,6 @@ export default function Home() {
           </div>
         </div>
 
-        <div>
-          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-            <span className="h-1.5 w-1.5 rounded-full bg-slate-400" />
-            高级
-            <span className="ml-2 rounded bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary">Pro</span>
-          </h2>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {advancedTools.map((t) => <ToolCard key={t.href} tool={t} />)}
-          </div>
-        </div>
       </section>
     </>
   )
