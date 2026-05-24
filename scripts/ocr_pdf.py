@@ -58,7 +58,7 @@ def main():
                 break  # Got text, done
 
         if not page_text:
-            page_text = "(本页未识别到文字)"
+            continue  # 跳过空白页
 
         full_text.append(page_text)
         os.remove(img_path)  # Clean up image
@@ -68,11 +68,9 @@ def main():
     # Create Word document
     docx_path = os.path.join(output_dir, "ocr_result.docx")
     word_doc = Document()
-    for i, text in enumerate(full_text):
+    for text in full_text:
         if text:
-            word_doc.add_paragraph(f"第 {i+1} 页").bold = True
             word_doc.add_paragraph(text)
-            word_doc.add_paragraph()  # blank line
     word_doc.save(docx_path)
 
     # Output as JSON
