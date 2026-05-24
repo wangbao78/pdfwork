@@ -1,6 +1,6 @@
 # PDF 工具箱需求文档
 
-## 已实现（13 个）
+## 已实现（16 个）
 
 **转换**
 - [x] PDF 转 Word（LibreOffice + pdf2docx）
@@ -8,16 +8,19 @@
 - [x] 提取图片（PyMuPDF）
 - [x] 图片转 PDF（pdf-lib，JPG/PNG/WebP）
 - [x] Office 转 PDF（LibreOffice，Word/Excel/PPT）
+- [x] HTML 转 PDF（wkhtmltopdf）
 
 **编辑**
 - [x] 合并 PDF（pdf-lib）
 - [x] 拆分 PDF（pdf-lib，范围选取）
 - [x] 旋转 PDF（pdf-lib，90°/180°/270°）
 - [x] 页面排序（pdf-lib，拖拽调序）
+- [x] PDF 页码（PyMuPDF，多种位置）
 
 **优化与安全**
 - [x] 压缩 PDF（Ghostscript，标准/高/极限）
 - [x] PDF 加水印（PyMuPDF，文字水印）
+- [x] 图片水印（PyMuPDF，图片叠加）
 - [x] 加密 / 解锁（Ghostscript，打开密码）
 
 ---
@@ -25,9 +28,10 @@
 ## 待实现
 
 ### 标记类
-- [ ] PDF 页码（页眉页脚、自动页码）
 - [ ] PDF 标注（高亮、下划线、批注）
-- [ ] 图片水印
+
+### 转换类
+- [ ] OCR 识别（Tesseract，扫描件 → 可编辑文字）
 
 ### 转换类
 - [ ] HTML 转 PDF

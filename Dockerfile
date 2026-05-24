@@ -1,7 +1,7 @@
 FROM node:22-slim
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    ghostscript libreoffice-writer fontconfig python3 python3-pip \
+    ghostscript libreoffice-writer fontconfig python3 python3-pip wkhtmltopdf \
   && rm -rf /var/lib/apt/lists/* \
   && mkdir -p /usr/share/fonts/truetype
 

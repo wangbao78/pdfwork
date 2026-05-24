@@ -2,7 +2,7 @@ import Link from "next/link"
 import {
   FileType, Combine, Shrink, Droplets, Scissors, Image,
   ImageUp, Images, RotateCw, FileText, Lock, ArrowRight,
-  Layers, ScanText, Zap,
+  Layers, ScanText, Code2, Stamp, FileDigit,
 } from "lucide-react"
 
 interface Tool {
@@ -41,6 +41,11 @@ const convertTools: Tool[] = [
     title: "Office 转 PDF", desc: "Word、Excel、PPT 转 PDF。",
     bgLight: "bg-indigo-50 dark:bg-indigo-950", iconColor: "text-indigo-600 dark:text-indigo-400",
   },
+  {
+    href: "/tools/html-to-pdf", icon: Code2,
+    title: "HTML 转 PDF", desc: "将 HTML 网页内容转为 PDF。",
+    bgLight: "bg-purple-50 dark:bg-purple-950", iconColor: "text-purple-600 dark:text-purple-400",
+  },
 ]
 
 const editTools: Tool[] = [
@@ -64,6 +69,11 @@ const editTools: Tool[] = [
     title: "页面排序", desc: "拖拽调整 PDF 页面顺序。",
     bgLight: "bg-amber-50 dark:bg-amber-950", iconColor: "text-amber-600 dark:text-amber-400",
   },
+  {
+    href: "/tools/page-number", icon: FileDigit,
+    title: "PDF 页码", desc: "在 PDF 每页添加页码，多种位置。",
+    bgLight: "bg-lime-50 dark:bg-lime-950", iconColor: "text-lime-600 dark:text-lime-400",
+  },
 ]
 
 const optimizeTools: Tool[] = [
@@ -76,6 +86,11 @@ const optimizeTools: Tool[] = [
     href: "/tools/watermark", icon: Droplets,
     title: "PDF 加水印", desc: "给 PDF 添加文字水印。",
     bgLight: "bg-orange-50 dark:bg-orange-950", iconColor: "text-orange-600 dark:text-orange-400",
+  },
+  {
+    href: "/tools/image-watermark", icon: Stamp,
+    title: "图片水印", desc: "上传图片作为水印叠加到 PDF。",
+    bgLight: "bg-yellow-50 dark:bg-yellow-950", iconColor: "text-yellow-600 dark:text-yellow-400",
   },
   {
     href: "/tools/protect-pdf", icon: Lock,
@@ -94,12 +109,6 @@ const advancedTools: Tool[] = [
   {
     href: "/pricing", icon: ScanText,
     title: "OCR 识别", desc: "扫描件中的文字转为可编辑文本。",
-    bgLight: "bg-slate-100 dark:bg-slate-800", iconColor: "text-slate-400 dark:text-slate-500",
-    soon: true,
-  },
-  {
-    href: "/pricing", icon: Zap,
-    title: "图片水印", desc: "上传图片作为水印叠加到 PDF。",
     bgLight: "bg-slate-100 dark:bg-slate-800", iconColor: "text-slate-400 dark:text-slate-500",
     soon: true,
   },
@@ -133,7 +142,7 @@ export default function Home() {
     <>
       <section className="mx-auto w-full max-w-5xl px-4 pt-16 pb-10 text-center">
         <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">PDF 工具箱</h1>
-        <p className="mt-3 text-muted-foreground">13+ 免费工具，在线处理 PDF — 转换、编辑、优化</p>
+        <p className="mt-3 text-muted-foreground">16 个工具，免费在线处理 PDF — 转换、编辑、优化、标记</p>
         <div className="mt-4 flex items-center justify-center gap-6 text-xs text-muted-foreground">
           <span>文件 ≤ 10MB</span>
           <span className="h-1 w-1 rounded-full bg-muted-foreground/30" />
@@ -182,7 +191,7 @@ export default function Home() {
             高级
             <span className="ml-2 rounded bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary">Pro</span>
           </h2>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-4 sm:grid-cols-2">
             {advancedTools.map((t) => <ToolCard key={t.href} tool={t} />)}
           </div>
         </div>
