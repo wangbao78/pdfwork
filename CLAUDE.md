@@ -16,8 +16,8 @@ Next.js 16.2.6 (App Router + Turbopack) SaaS 网站，提供 18 个 PDF 在线�
 ## 环境与命令
 
 ```bash
-# 所有命令必须在 pdfwork 目录下执行
-cd /d/vscode/pdfwork
+# 所有命令必须在 pdfwork 目录下执行，需先 export PATH
+export PATH="/d/nodejs:$PATH"
 
 # 构建
 /d/nodejs/npx next build
