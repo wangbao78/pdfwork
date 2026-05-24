@@ -1,14 +1,16 @@
 import { NextResponse } from "next/server"
 import { watermarkPdf, type WatermarkOptions } from "@/lib/pdf/watermark"
 import { cleanupOld } from "@/lib/cleanup"
+import { updateFileStatus } from "@/lib/file-status"
 
 export async function POST(req: Request) {
   cleanupOld()
-
+  let rk = ""
   try {
     const { r2Key, text, fontSize, opacity, rotation, color } = await req.json()
+    rk = r2Key
 
-    if (!r2Key || typeof r2Key !== "string") {
+    if (!rk || typeof rk !== "string") {
       return NextResponse.json({ error: "缺少文件标识" }, { status: 400 })
     }
     if (!text || typeof text !== "string" || text.trim().length === 0) {
@@ -28,13 +30,16 @@ export async function POST(req: Request) {
         : [0.5, 0.5, 0.5],
     }
 
-    const result = await watermarkPdf(r2Key, options)
+    await updateFileStatus(rk, "PROCESSING")
+    const result = await watermarkPdf(rk, options)
 
+    await updateFileStatus(rk, "DONE")
     return NextResponse.json({
       downloadUrl: result.downloadUrl,
       resultKey: result.resultKey,
     })
   } catch (e) {
+    if (rk) await updateFileStatus(rk, "ERROR")
     const message = e instanceof Error ? e.message : "水印添加失败"
     return NextResponse.json({ error: message }, { status: 500 })
   }
