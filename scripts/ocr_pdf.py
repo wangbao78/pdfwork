@@ -27,22 +27,27 @@ def main():
         pix.save(img_path)
 
         # OCR with Tesseract (Chinese simplified + English)
-        txt_path = os.path.join(output_dir, f"page_{page_num+1}")
-        result = subprocess.run([
-            "tesseract", img_path, txt_path,
-            "-l", "chi_sim+eng",
-            "--psm", "6",
-        ], capture_output=True, timeout=120)
+        # Test PSM modes in order: 3=auto, 6=block, 4=single column
+        page_text = ""
+        for psm in [3, 6, 4]:
+            txt_path = os.path.join(output_dir, f"page_{page_num+1}")
+            result = subprocess.run([
+                "tesseract", img_path, txt_path,
+                "-l", "chi_sim+eng",
+                "--psm", str(psm),
+            ], capture_output=True, timeout=120)
 
-        if result.returncode != 0:
-            raise Exception(f"Tesseract error (page {page_num+1}): {result.stderr.decode('utf-8', errors='ignore')[:300]}")
+            if result.returncode != 0:
+                err = result.stderr.decode("utf-8", errors="ignore")[:200]
+                raise Exception(f"Tesseract error (page {page_num+1}, psm={psm}): {err}")
 
-        txt_file = txt_path + ".txt"
-        if os.path.exists(txt_file):
-            with open(txt_file, "r", encoding="utf-8") as f:
-                page_text = f.read().strip()
-        else:
-            page_text = ""
+            txt_file = txt_path + ".txt"
+            if os.path.exists(txt_file):
+                with open(txt_file, "r", encoding="utf-8") as f:
+                    page_text = f.read().strip()
+            if page_text:
+                break  # Got text, done
+
         if not page_text:
             page_text = "(本页未识别到文字)"
 
