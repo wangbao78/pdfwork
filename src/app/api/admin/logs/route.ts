@@ -15,14 +15,19 @@ export async function DELETE(req: Request) {
   }
 
   const url = new URL(req.url)
-  const id = url.searchParams.get("id")
-  if (!id) {
+  const ids = url.searchParams.get("ids") || url.searchParams.get("id")
+  if (!ids) {
     return NextResponse.json({ error: "缺少 ID" }, { status: 400 })
   }
 
   try {
-    await db.file.delete({ where: { id } })
-    return NextResponse.json({ ok: true })
+    const idList = ids.split(",")
+    if (idList.length === 1) {
+      await db.file.delete({ where: { id: idList[0] } })
+    } else {
+      await db.file.deleteMany({ where: { id: { in: idList } } })
+    }
+    return NextResponse.json({ ok: true, count: idList.length })
   } catch {
     return NextResponse.json({ error: "删除失败" }, { status: 500 })
   }

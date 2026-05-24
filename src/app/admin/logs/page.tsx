@@ -1,21 +1,11 @@
 import { db } from "@/lib/db"
-import { Card } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { ChevronLeft, ChevronRight, ChevronFirst, ChevronLast } from "lucide-react"
 import Link from "next/link"
-import { DeleteLogButton } from "@/components/admin/DeleteLogButton"
+import { LogsTable } from "@/components/admin/LogsTable"
 
 export const dynamic = "force-dynamic"
 
 const PAGE_SIZE = 20
-
-const STATUS_MAP: Record<string, { label: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
-  DONE: { label: "完成", variant: "default" },
-  PROCESSING: { label: "处理中", variant: "secondary" },
-  ERROR: { label: "失败", variant: "destructive" },
-  PENDING: { label: "等待中", variant: "outline" },
-}
 
 const STATUS_FILTERS = [
   { label: "全部", value: "" },
@@ -24,12 +14,6 @@ const STATUS_FILTERS = [
   { label: "失败", value: "ERROR" },
   { label: "等待中", value: "PENDING" },
 ]
-
-function formatSize(bytes: number) {
-  if (bytes < 1024) return `${bytes} B`
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
-}
 
 export default async function AdminLogsPage({
   searchParams,
@@ -47,14 +31,12 @@ export default async function AdminLogsPage({
   if (status) where.status = status as "DONE" | "PROCESSING" | "ERROR" | "PENDING"
   if (q) where.name = { contains: q }
 
-  // 用户筛选：先查匹配的用户 ID 和 IP
-  let userIds: string[] = []
   if (userFilter) {
     const matchedUsers = await db.user.findMany({
       where: { email: { contains: userFilter } },
       select: { id: true },
     })
-    userIds = matchedUsers.map((u) => u.id)
+    const userIds = matchedUsers.map((u) => u.id)
     where.OR = [
       { userId: { in: userIds } },
       { ip: { contains: userFilter } },
@@ -109,6 +91,28 @@ export default async function AdminLogsPage({
     return `/admin/logs?${params.toString()}`
   }
 
+  const rows = files.map((f) => {
+    let userLabel = "-"
+    if (f.userId) {
+      userLabel = userMap.get(f.userId) || "-"
+    } else if (f.ip) {
+      userLabel = `游客 ${f.ip}`
+    } else {
+      userLabel = "游客"
+    }
+    return {
+      id: f.id,
+      name: f.name,
+      size: f.size,
+      status: f.status,
+      tool: f.tool,
+      ip: f.ip,
+      userId: f.userId,
+      createdAt: f.createdAt,
+      userLabel,
+    }
+  })
+
   return (
     <div>
       <div className="flex items-center justify-between">
@@ -153,144 +157,13 @@ export default async function AdminLogsPage({
         </form>
       </div>
 
-      {/* Table */}
-      <Card className="mt-4 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b bg-muted/50">
-                <th className="px-4 py-3 text-left font-medium">文件名</th>
-                <th className="px-4 py-3 text-left font-medium">功能</th>
-                <th className="px-4 py-3 text-right font-medium hidden sm:table-cell">
-                  大小
-                </th>
-                <th className="px-4 py-3 text-left font-medium hidden md:table-cell">
-                  用户
-                </th>
-                <th className="px-4 py-3 text-left font-medium">状态</th>
-                <th className="px-4 py-3 text-right font-medium hidden lg:table-cell">
-                  时间
-                </th>
-                <th className="px-4 py-3 w-10"></th>
-              </tr>
-            </thead>
-            <tbody>
-              {files.map((f) => {
-                const st = STATUS_MAP[f.status] || STATUS_MAP.PENDING
-                let userLabel = "-"
-                if (f.userId) {
-                  userLabel = userMap.get(f.userId) || "-"
-                } else if (f.ip) {
-                  userLabel = `游客 ${f.ip}`
-                } else {
-                  userLabel = "游客"
-                }
-                return (
-                  <tr
-                    key={f.id}
-                    className="border-b last:border-0 hover:bg-muted/30"
-                  >
-                    <td className="px-4 py-3 font-medium max-w-[220px] truncate">
-                      {f.name}
-                    </td>
-                    <td className="px-4 py-3 text-muted-foreground">
-                      {f.tool || "-"}
-                    </td>
-                    <td className="px-4 py-3 text-right tabular-nums hidden sm:table-cell">
-                      {formatSize(f.size)}
-                    </td>
-                    <td className="px-4 py-3 text-muted-foreground hidden md:table-cell max-w-[200px] truncate">
-                      {userLabel}
-                    </td>
-                    <td className="px-4 py-3">
-                      <Badge variant={st.variant}>{st.label}</Badge>
-                    </td>
-                    <td className="px-4 py-3 text-right text-muted-foreground tabular-nums hidden lg:table-cell">
-                      {f.createdAt.toLocaleString("zh-CN", {
-                        month: "2-digit",
-                        day: "2-digit",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                    </td>
-                    <td className="px-2 py-3">
-                      <DeleteLogButton id={f.id} />
-                    </td>
-                  </tr>
-                )
-              })}
-              {files.length === 0 && (
-                <tr>
-                  <td
-                    colSpan={7}
-                    className="px-4 py-12 text-center text-muted-foreground"
-                  >
-                    暂无记录
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        {totalPages > 1 && (
-          <div className="flex items-center justify-between border-t px-4 py-3">
-            <span className="text-sm text-muted-foreground">
-              第 {page} / {totalPages} 页
-            </span>
-            <div className="flex gap-2">
-              {page > 1 ? (
-                <Link href={link(1)}>
-                  <Button variant="outline" size="sm" title="首页">
-                    <ChevronFirst className="h-4 w-4" />
-                  </Button>
-                </Link>
-              ) : (
-                <Button variant="outline" size="sm" disabled>
-                  <ChevronFirst className="h-4 w-4" />
-                </Button>
-              )}
-              {page > 1 ? (
-                <Link href={link(page - 1)}>
-                  <Button variant="outline" size="sm">
-                    <ChevronLeft className="h-4 w-4 mr-1" />
-                    上一页
-                  </Button>
-                </Link>
-              ) : (
-                <Button variant="outline" size="sm" disabled>
-                  <ChevronLeft className="h-4 w-4 mr-1" />
-                  上一页
-                </Button>
-              )}
-              {page < totalPages ? (
-                <Link href={link(page + 1)}>
-                  <Button variant="outline" size="sm">
-                    下一页
-                    <ChevronRight className="h-4 w-4 ml-1" />
-                  </Button>
-                </Link>
-              ) : (
-                <Button variant="outline" size="sm" disabled>
-                  下一页
-                  <ChevronRight className="h-4 w-4 ml-1" />
-                </Button>
-              )}
-              {page < totalPages ? (
-                <Link href={link(totalPages)}>
-                  <Button variant="outline" size="sm" title="末页">
-                    <ChevronLast className="h-4 w-4" />
-                  </Button>
-                </Link>
-              ) : (
-                <Button variant="outline" size="sm" disabled>
-                  <ChevronLast className="h-4 w-4" />
-                </Button>
-              )}
-            </div>
-          </div>
-        )}
-      </Card>
+      <LogsTable
+        files={rows}
+        total={total}
+        page={page}
+        totalPages={totalPages}
+        link={link}
+      />
     </div>
   )
 }
