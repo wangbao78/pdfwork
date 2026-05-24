@@ -73,6 +73,7 @@ export async function POST(req: Request) {
             type: "application/pdf",
             status: "PENDING",
             r2Key,
+            userId: user.id || null,
             expiresAt: new Date(Date.now() + 3600 * 1000),
           },
         })
@@ -102,6 +103,7 @@ export async function POST(req: Request) {
           type: "application/pdf",
           status: "PENDING",
           r2Key,
+          userId: user.id || null,
           expiresAt: new Date(Date.now() + 3600 * 1000),
         },
       })
