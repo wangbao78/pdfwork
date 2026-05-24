@@ -23,7 +23,7 @@ export async function POST(req: Request) {
     const ops = ["convert", "compress", "watermark"]
     const op: BatchOptions["operation"] = ops.includes(operation) ? operation : "convert"
 
-    await updateFileStatusBulk(rks, "PROCESSING")
+    await updateFileStatusBulk(rks, "PROCESSING", "批量处理")
     const result = await batchProcess(rks, {
       operation: op,
       watermarkText: watermarkText?.slice(0, 100) || "机密",

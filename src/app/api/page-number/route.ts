@@ -20,7 +20,7 @@ export async function POST(req: Request) {
     ]
     const pos = positions.includes(position) ? position : "bottom-center"
 
-    await updateFileStatus(rk, "PROCESSING")
+    await updateFileStatus(rk, "PROCESSING", "PDF 页码")
     const downloadUrl = await addPageNumbers(rk, {
       position: pos,
       fontSize: Math.min(Math.max(fontSize || 10, 6), 30),

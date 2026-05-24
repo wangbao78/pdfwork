@@ -20,7 +20,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "最多保留 100 页" }, { status: 400 })
     }
 
-    await updateFileStatus(rk, "PROCESSING")
+    await updateFileStatus(rk, "PROCESSING", "拆分 PDF")
     const result = await splitPdf(rk, pages)
 
     await updateFileStatus(rk, "DONE")

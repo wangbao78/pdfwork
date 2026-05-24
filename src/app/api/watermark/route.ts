@@ -30,7 +30,7 @@ export async function POST(req: Request) {
         : [0.5, 0.5, 0.5],
     }
 
-    await updateFileStatus(rk, "PROCESSING")
+    await updateFileStatus(rk, "PROCESSING", "文字水印")
     const result = await watermarkPdf(rk, options)
 
     await updateFileStatus(rk, "DONE")

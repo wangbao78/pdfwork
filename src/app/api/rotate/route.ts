@@ -17,7 +17,7 @@ export async function POST(req: Request) {
     const valid: Rotation[] = [90, 180, 270]
     const rot: Rotation = valid.includes(rotation) ? rotation : 90
 
-    await updateFileStatus(rk, "PROCESSING")
+    await updateFileStatus(rk, "PROCESSING", "旋转 PDF")
     const result = await rotatePdf(rk, rot)
 
     await updateFileStatus(rk, "DONE")

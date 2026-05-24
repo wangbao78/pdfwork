@@ -43,6 +43,8 @@ export type FileMinAggregateOutputType = {
   r2Key: string | null
   resultKey: string | null
   error: string | null
+  ip: string | null
+  tool: string | null
   userId: string | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -58,6 +60,8 @@ export type FileMaxAggregateOutputType = {
   r2Key: string | null
   resultKey: string | null
   error: string | null
+  ip: string | null
+  tool: string | null
   userId: string | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -73,6 +77,8 @@ export type FileCountAggregateOutputType = {
   r2Key: number
   resultKey: number
   error: number
+  ip: number
+  tool: number
   userId: number
   createdAt: number
   updatedAt: number
@@ -98,6 +104,8 @@ export type FileMinAggregateInputType = {
   r2Key?: true
   resultKey?: true
   error?: true
+  ip?: true
+  tool?: true
   userId?: true
   createdAt?: true
   updatedAt?: true
@@ -113,6 +121,8 @@ export type FileMaxAggregateInputType = {
   r2Key?: true
   resultKey?: true
   error?: true
+  ip?: true
+  tool?: true
   userId?: true
   createdAt?: true
   updatedAt?: true
@@ -128,6 +138,8 @@ export type FileCountAggregateInputType = {
   r2Key?: true
   resultKey?: true
   error?: true
+  ip?: true
+  tool?: true
   userId?: true
   createdAt?: true
   updatedAt?: true
@@ -230,6 +242,8 @@ export type FileGroupByOutputType = {
   r2Key: string | null
   resultKey: string | null
   error: string | null
+  ip: string | null
+  tool: string | null
   userId: string | null
   createdAt: Date
   updatedAt: Date
@@ -268,6 +282,8 @@ export type FileWhereInput = {
   r2Key?: Prisma.StringNullableFilter<"File"> | string | null
   resultKey?: Prisma.StringNullableFilter<"File"> | string | null
   error?: Prisma.StringNullableFilter<"File"> | string | null
+  ip?: Prisma.StringNullableFilter<"File"> | string | null
+  tool?: Prisma.StringNullableFilter<"File"> | string | null
   userId?: Prisma.StringNullableFilter<"File"> | string | null
   createdAt?: Prisma.DateTimeFilter<"File"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"File"> | Date | string
@@ -284,6 +300,8 @@ export type FileOrderByWithRelationInput = {
   r2Key?: Prisma.SortOrderInput | Prisma.SortOrder
   resultKey?: Prisma.SortOrderInput | Prisma.SortOrder
   error?: Prisma.SortOrderInput | Prisma.SortOrder
+  ip?: Prisma.SortOrderInput | Prisma.SortOrder
+  tool?: Prisma.SortOrderInput | Prisma.SortOrder
   userId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -303,6 +321,8 @@ export type FileWhereUniqueInput = Prisma.AtLeast<{
   r2Key?: Prisma.StringNullableFilter<"File"> | string | null
   resultKey?: Prisma.StringNullableFilter<"File"> | string | null
   error?: Prisma.StringNullableFilter<"File"> | string | null
+  ip?: Prisma.StringNullableFilter<"File"> | string | null
+  tool?: Prisma.StringNullableFilter<"File"> | string | null
   userId?: Prisma.StringNullableFilter<"File"> | string | null
   createdAt?: Prisma.DateTimeFilter<"File"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"File"> | Date | string
@@ -319,6 +339,8 @@ export type FileOrderByWithAggregationInput = {
   r2Key?: Prisma.SortOrderInput | Prisma.SortOrder
   resultKey?: Prisma.SortOrderInput | Prisma.SortOrder
   error?: Prisma.SortOrderInput | Prisma.SortOrder
+  ip?: Prisma.SortOrderInput | Prisma.SortOrder
+  tool?: Prisma.SortOrderInput | Prisma.SortOrder
   userId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -342,6 +364,8 @@ export type FileScalarWhereWithAggregatesInput = {
   r2Key?: Prisma.StringNullableWithAggregatesFilter<"File"> | string | null
   resultKey?: Prisma.StringNullableWithAggregatesFilter<"File"> | string | null
   error?: Prisma.StringNullableWithAggregatesFilter<"File"> | string | null
+  ip?: Prisma.StringNullableWithAggregatesFilter<"File"> | string | null
+  tool?: Prisma.StringNullableWithAggregatesFilter<"File"> | string | null
   userId?: Prisma.StringNullableWithAggregatesFilter<"File"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"File"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"File"> | Date | string
@@ -357,6 +381,8 @@ export type FileCreateInput = {
   r2Key?: string | null
   resultKey?: string | null
   error?: string | null
+  ip?: string | null
+  tool?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   expiresAt: Date | string
@@ -372,6 +398,8 @@ export type FileUncheckedCreateInput = {
   r2Key?: string | null
   resultKey?: string | null
   error?: string | null
+  ip?: string | null
+  tool?: string | null
   userId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -387,6 +415,8 @@ export type FileUpdateInput = {
   r2Key?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   resultKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   error?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ip?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tool?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -402,6 +432,8 @@ export type FileUncheckedUpdateInput = {
   r2Key?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   resultKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   error?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ip?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tool?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -417,6 +449,8 @@ export type FileCreateManyInput = {
   r2Key?: string | null
   resultKey?: string | null
   error?: string | null
+  ip?: string | null
+  tool?: string | null
   userId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -432,6 +466,8 @@ export type FileUpdateManyMutationInput = {
   r2Key?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   resultKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   error?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ip?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tool?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -446,6 +482,8 @@ export type FileUncheckedUpdateManyInput = {
   r2Key?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   resultKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   error?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ip?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tool?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -471,6 +509,8 @@ export type FileCountOrderByAggregateInput = {
   r2Key?: Prisma.SortOrder
   resultKey?: Prisma.SortOrder
   error?: Prisma.SortOrder
+  ip?: Prisma.SortOrder
+  tool?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -490,6 +530,8 @@ export type FileMaxOrderByAggregateInput = {
   r2Key?: Prisma.SortOrder
   resultKey?: Prisma.SortOrder
   error?: Prisma.SortOrder
+  ip?: Prisma.SortOrder
+  tool?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -505,6 +547,8 @@ export type FileMinOrderByAggregateInput = {
   r2Key?: Prisma.SortOrder
   resultKey?: Prisma.SortOrder
   error?: Prisma.SortOrder
+  ip?: Prisma.SortOrder
+  tool?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -570,6 +614,8 @@ export type FileCreateWithoutUserInput = {
   r2Key?: string | null
   resultKey?: string | null
   error?: string | null
+  ip?: string | null
+  tool?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   expiresAt: Date | string
@@ -584,6 +630,8 @@ export type FileUncheckedCreateWithoutUserInput = {
   r2Key?: string | null
   resultKey?: string | null
   error?: string | null
+  ip?: string | null
+  tool?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   expiresAt: Date | string
@@ -627,6 +675,8 @@ export type FileScalarWhereInput = {
   r2Key?: Prisma.StringNullableFilter<"File"> | string | null
   resultKey?: Prisma.StringNullableFilter<"File"> | string | null
   error?: Prisma.StringNullableFilter<"File"> | string | null
+  ip?: Prisma.StringNullableFilter<"File"> | string | null
+  tool?: Prisma.StringNullableFilter<"File"> | string | null
   userId?: Prisma.StringNullableFilter<"File"> | string | null
   createdAt?: Prisma.DateTimeFilter<"File"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"File"> | Date | string
@@ -642,6 +692,8 @@ export type FileCreateManyUserInput = {
   r2Key?: string | null
   resultKey?: string | null
   error?: string | null
+  ip?: string | null
+  tool?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   expiresAt: Date | string
@@ -656,6 +708,8 @@ export type FileUpdateWithoutUserInput = {
   r2Key?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   resultKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   error?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ip?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tool?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -670,6 +724,8 @@ export type FileUncheckedUpdateWithoutUserInput = {
   r2Key?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   resultKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   error?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ip?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tool?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -684,6 +740,8 @@ export type FileUncheckedUpdateManyWithoutUserInput = {
   r2Key?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   resultKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   error?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ip?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tool?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -700,6 +758,8 @@ export type FileSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   r2Key?: boolean
   resultKey?: boolean
   error?: boolean
+  ip?: boolean
+  tool?: boolean
   userId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -716,6 +776,8 @@ export type FileSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   r2Key?: boolean
   resultKey?: boolean
   error?: boolean
+  ip?: boolean
+  tool?: boolean
   userId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -732,6 +794,8 @@ export type FileSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   r2Key?: boolean
   resultKey?: boolean
   error?: boolean
+  ip?: boolean
+  tool?: boolean
   userId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -748,13 +812,15 @@ export type FileSelectScalar = {
   r2Key?: boolean
   resultKey?: boolean
   error?: boolean
+  ip?: boolean
+  tool?: boolean
   userId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   expiresAt?: boolean
 }
 
-export type FileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "size" | "type" | "status" | "r2Key" | "resultKey" | "error" | "userId" | "createdAt" | "updatedAt" | "expiresAt", ExtArgs["result"]["file"]>
+export type FileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "size" | "type" | "status" | "r2Key" | "resultKey" | "error" | "ip" | "tool" | "userId" | "createdAt" | "updatedAt" | "expiresAt", ExtArgs["result"]["file"]>
 export type FileInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.File$userArgs<ExtArgs>
 }
@@ -779,6 +845,8 @@ export type $FilePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     r2Key: string | null
     resultKey: string | null
     error: string | null
+    ip: string | null
+    tool: string | null
     userId: string | null
     createdAt: Date
     updatedAt: Date
@@ -1215,6 +1283,8 @@ export interface FileFieldRefs {
   readonly r2Key: Prisma.FieldRef<"File", 'String'>
   readonly resultKey: Prisma.FieldRef<"File", 'String'>
   readonly error: Prisma.FieldRef<"File", 'String'>
+  readonly ip: Prisma.FieldRef<"File", 'String'>
+  readonly tool: Prisma.FieldRef<"File", 'String'>
   readonly userId: Prisma.FieldRef<"File", 'String'>
   readonly createdAt: Prisma.FieldRef<"File", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"File", 'DateTime'>

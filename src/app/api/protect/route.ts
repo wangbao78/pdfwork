@@ -24,7 +24,7 @@ export async function POST(req: Request) {
 
     if (action === "unlock") {
       try {
-        await updateFileStatus(rk, "PROCESSING")
+        await updateFileStatus(rk, "PROCESSING", "解锁 PDF")
         const result = await unlockPdf(rk, password)
         trackUsage(user)
         await updateFileStatus(rk, "DONE")
@@ -35,7 +35,7 @@ export async function POST(req: Request) {
       }
     }
 
-    await updateFileStatus(rk, "PROCESSING")
+    await updateFileStatus(rk, "PROCESSING", "加密 PDF")
     const result = await protectPdf(rk, password)
     trackUsage(user)
     await updateFileStatus(rk, "DONE")

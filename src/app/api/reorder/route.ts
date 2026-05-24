@@ -17,7 +17,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "排序数据无效" }, { status: 400 })
     }
 
-    await updateFileStatus(rk, "PROCESSING")
+    await updateFileStatus(rk, "PROCESSING", "页面排序")
     const result = await reorderPdf(rk, order)
 
     await updateFileStatus(rk, "DONE")

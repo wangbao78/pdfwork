@@ -23,7 +23,7 @@ export async function POST(req: Request) {
       if (block) return block
     }
 
-    await updateFileStatus(rk, "PROCESSING")
+    await updateFileStatus(rk, "PROCESSING", "压缩 PDF")
     const result = await compressPdf(rk, compressLevel)
 
     trackUsage(await getAccessUser())

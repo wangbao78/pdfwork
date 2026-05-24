@@ -24,7 +24,7 @@ export async function POST(req: Request) {
       )
     }
 
-    await updateFileStatusBulk(rks, "PROCESSING")
+    await updateFileStatusBulk(rks, "PROCESSING", "合并 PDF")
     const result = await mergePdfs(rks)
 
     await updateFileStatusBulk(rks, "DONE")

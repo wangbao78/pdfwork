@@ -102,6 +102,8 @@ export const FileScalarFieldEnum = {
   r2Key: 'r2Key',
   resultKey: 'resultKey',
   error: 'error',
+  ip: 'ip',
+  tool: 'tool',
   userId: 'userId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',

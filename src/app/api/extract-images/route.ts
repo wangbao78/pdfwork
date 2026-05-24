@@ -18,7 +18,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "仅支持 PDF 文件" }, { status: 400 })
     }
 
-    await updateFileStatus(rk, "PROCESSING")
+    await updateFileStatus(rk, "PROCESSING", "提取图片")
     const images = await extractImages(rk)
 
     await updateFileStatus(rk, "DONE")

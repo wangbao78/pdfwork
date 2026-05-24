@@ -14,7 +14,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "缺少文件标识" }, { status: 400 })
     }
 
-    await updateFileStatus(rk, "PROCESSING")
+    await updateFileStatus(rk, "PROCESSING", "PDF 转 JPG")
     const images = await pdfToJpg(rk)
 
     await updateFileStatus(rk, "DONE")

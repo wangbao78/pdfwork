@@ -25,7 +25,7 @@ export async function POST(req: Request) {
     const wmBuf = Buffer.from(await wmFile.arrayBuffer())
     const ext = wmFile.name.split(".").pop() || "png"
 
-    await updateFileStatus(rk, "PROCESSING")
+    await updateFileStatus(rk, "PROCESSING", "图片水印")
     const downloadUrl = await imageWatermarkPdf(rk, wmBuf, ext, {
       opacity: Number(formData.get("opacity")) || 0.3,
       scale: Number(formData.get("scale")) || 0.25,

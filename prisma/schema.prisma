@@ -39,6 +39,8 @@ model File {
   r2Key     String?
   resultKey String?
   error     String?
+  ip        String?
+  tool      String?
   userId    String?
   user      User?    @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())
