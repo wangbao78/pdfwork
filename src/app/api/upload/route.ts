@@ -62,16 +62,6 @@ export async function POST(req: Request) {
       return apiError("请求过于频繁，请稍后再试", 429)
     }
 
-    // 限额检查
-    const user = await getAccessUser()
-    if (user.isGuest) {
-      const guestErr = await checkGuestQuota(ip)
-      if (guestErr) return apiError(guestErr, 429)
-    } else {
-      const quotaErr = await checkQuota(user, 0, 0)
-      if (quotaErr) return apiError(quotaErr, 429)
-    }
-
     // Local mode: accept file directly via multipart
     if (!isR2Configured) {
       const formData = await req.formData()
@@ -84,6 +74,16 @@ export async function POST(req: Request) {
 
       const buf = Buffer.from(await file.arrayBuffer())
       if (!isPdfHeader(buf)) return apiError("无效的 PDF 文件", 400)
+
+      // 限额检查（校验通过后才扣次数）
+      const user = await getAccessUser()
+      if (user.isGuest) {
+        const guestErr = await checkGuestQuota(ip)
+        if (guestErr) return apiError(guestErr, 429)
+      } else {
+        const quotaErr = await checkQuota(user, file.size, 0)
+        if (quotaErr) return apiError(quotaErr, 429)
+      }
 
       const fileId = cuid()
       const r2Key = `uploads/${fileId}/${file.name}`
@@ -120,6 +120,16 @@ export async function POST(req: Request) {
     if (!size || typeof size !== "number" || size <= 0) return apiError("文件大小无效", 400)
     if (!name.toLowerCase().endsWith(".pdf")) return apiError("仅支持 PDF 文件", 400)
 
+    // 限额检查（校验通过后才扣次数）
+    const userR2 = await getAccessUser()
+    if (userR2.isGuest) {
+      const guestErr = await checkGuestQuota(ip)
+      if (guestErr) return apiError(guestErr, 429)
+    } else {
+      const quotaErr = await checkQuota(userR2, size, 0)
+      if (quotaErr) return apiError(quotaErr, 429)
+    }
+
     const fileId = cuid()
     const r2Key = `uploads/${fileId}/${name}`
     const uploadUrl = await getUploadUrl(r2Key)
@@ -135,7 +145,7 @@ export async function POST(req: Request) {
           r2Key,
           tool,
           ip,
-          userId: user.id || null,
+          userId: userR2.id || null,
           expiresAt: new Date(Date.now() + 3600 * 1000),
         },
       })

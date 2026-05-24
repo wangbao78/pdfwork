@@ -211,17 +211,18 @@ export async function checkGuestQuota(ip: string): Promise<string | null> {
 
   // Try DB first
   try {
-    let record = await db.guestUsage.findUnique({
+    const record = await db.guestUsage.findUnique({
       where: { ip_date: { ip, date: td } },
     })
     if (!record) {
       await db.guestUsage.create({ data: { ip, date: td, count: 1 } })
       return null
     }
-    await db.guestUsage.update({ where: { id: record.id }, data: { count: record.count + 1 } })
+    // 先检查再更新，避免超额使用
     if (record.count >= GUEST_DAILY) {
       return `今日免费次数已用完（${GUEST_DAILY} 次），请登录后继续使用`
     }
+    await db.guestUsage.update({ where: { id: record.id }, data: { count: record.count + 1 } })
     return null
   } catch {
     // DB 不可用，回退到 JSON 文件
@@ -247,7 +248,7 @@ export async function checkGuestQuota(ip: string): Promise<string | null> {
   counters[key] = record
   await writeFile(COUNTER_PATH, JSON.stringify(counters), "utf-8")
 
-  if (record.count > GUEST_DAILY) {
+  if (record.count >= GUEST_DAILY) {
     return `今日免费次数已用完（${GUEST_DAILY} 次），请登录后继续使用`
   }
 
