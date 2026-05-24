@@ -15,6 +15,15 @@ def main():
     output_dir = sys.argv[2]
     os.makedirs(output_dir, exist_ok=True)
 
+    # Check tesseract availability and languages
+    tesseract_check = subprocess.run(["tesseract", "--list-langs"], capture_output=True, timeout=10)
+    if tesseract_check.returncode != 0:
+        raise Exception(f"Tesseract not found: {tesseract_check.stderr.decode('utf-8', errors='ignore')[:200]}")
+
+    available_langs = tesseract_check.stdout.decode("utf-8", errors="ignore")
+    if "chi_sim" not in available_langs:
+        raise Exception(f"Chinese language pack missing. Available: {available_langs.strip().replace(chr(10),', ')}")
+
     doc = fitz.open(input_pdf)
     total = len(doc)
     full_text = []
