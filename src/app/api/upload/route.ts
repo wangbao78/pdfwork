@@ -6,7 +6,7 @@ import { getUploadUrl } from "@/lib/r2"
 import { db } from "@/lib/db"
 import { checkRateLimit, apiError } from "@/lib/api-utils"
 import { cleanupOld } from "@/lib/cleanup"
-import { getAccessUser, checkQuota, checkGuestQuota } from "@/lib/access"
+import { getAccessUser, checkQuota, checkGuestQuota, trackUsage } from "@/lib/access"
 
 const UPLOAD_DIR = join(process.cwd(), ".data", "uploads")
 const MAX_FILE_SIZE = 100 * 1024 * 1024 // 100MB
@@ -78,6 +78,7 @@ export async function POST(req: Request) {
         })
       } catch { /* no DB */ }
 
+      trackUsage(user)
       return NextResponse.json({ fileId, r2Key, local: true })
     }
 
