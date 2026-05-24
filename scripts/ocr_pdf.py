@@ -56,28 +56,24 @@ def main():
         page = doc[page_num]
         images = page.get_images(full=True)
 
-        if images:
-            # OCR each embedded image at native resolution
-            for img_idx, img_info in enumerate(images):
-                xref = img_info[0]
-                try:
-                    base = doc.extract_image(xref)
-                    img_data = base["image"]
-                    img_ext = base["ext"]
-                    img_name = f"page{page_num+1}_img{img_idx+1}.{img_ext}"
-                    text = ocr_image(img_data, img_name)
-                    if text:
-                        full_text.append(text)
-                except Exception:
-                    pass
-        else:
-            # No embedded images: OCR the whole page
-            pix = page.get_pixmap(dpi=300)
-            img_path = os.path.join(output_dir, f"page_{page_num+1}.png")
-            pix.save(img_path)
-            text = ocr_image(open(img_path, "rb").read(), f"page_{page_num+1}.png")
-            if text:
-                full_text.append(text)
+        # 1. Extract embedded text
+        page_text = page.get_text().strip()
+        if page_text:
+            full_text.append(page_text)
+
+        # 2. OCR embedded images at native resolution
+        for img_idx, img_info in enumerate(images):
+            xref = img_info[0]
+            try:
+                base = doc.extract_image(xref)
+                img_data = base["image"]
+                img_ext = base["ext"]
+                img_name = f"page{page_num+1}_img{img_idx+1}.{img_ext}"
+                text = ocr_image(img_data, img_name)
+                if text:
+                    full_text.append(text)
+            except Exception:
+                pass
 
     doc.close()
 
