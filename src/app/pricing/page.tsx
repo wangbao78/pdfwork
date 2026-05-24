@@ -1,4 +1,9 @@
-import { Check, X } from "lucide-react"
+"use client"
+
+import { useState } from "react"
+import { useSession } from "next-auth/react"
+import { useRouter } from "next/navigation"
+import { Check, X, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 const plans = [
@@ -7,7 +12,7 @@ const plans = [
     price: "免费",
     period: "",
     features: [
-      { text: "文件 ≤ 10MB，≤ 20 页", ok: true },
+      { text: "文件 ≤ 10MB，≤ 30 页 ", ok: true },
       { text: "游客每日 3 次 / 登录每日 5 次", ok: true },
       { text: "PDF 转 Word / JPG / 提取图片", ok: true },
       { text: "图片转 PDF / HTML 转 PDF", ok: true },
@@ -49,6 +54,35 @@ const plans = [
 ]
 
 export default function PricingPage() {
+  const { data: session } = useSession()
+  const router = useRouter()
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const userPlan = (session?.user as Record<string, unknown> | undefined)?.plan as string | undefined
+  const isPro = userPlan === "PRO"
+  const isLoggedIn = !!session?.user
+
+  const handleUpgrade = async () => {
+    setError(null)
+
+    if (!isLoggedIn) {
+      router.push("/auth/login?callback=/pricing")
+      return
+    }
+
+    setLoading(true)
+    try {
+      const res = await fetch("/api/stripe/checkout", { method: "POST" })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || "支付服务暂不可用")
+      window.location.href = data.url
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "操作失败，请稍后重试")
+      setLoading(false)
+    }
+  }
+
   return (
     <div className="mx-auto w-full max-w-4xl px-4 py-16">
       <div className="text-center">
@@ -58,54 +92,71 @@ export default function PricingPage() {
         </p>
       </div>
 
+      {error && (
+        <div className="mt-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-center text-sm text-red-700">
+          {error}
+        </div>
+      )}
+
       <div className="mt-12 grid gap-8 lg:grid-cols-2">
-        {plans.map((plan) => (
-          <div
-            key={plan.name}
-            className={`rounded-xl border p-8 ${
-              plan.featured
-                ? "border-primary shadow-lg ring-1 ring-primary"
-                : ""
-            }`}
-          >
-            {plan.featured && (
-              <span className="inline-block rounded-full bg-primary px-3 py-0.5 text-xs font-medium text-primary-foreground mb-4">
-                推荐
-              </span>
-            )}
-            <h2 className="text-xl font-semibold">{plan.name}</h2>
-            <div className="mt-4 flex items-baseline gap-1">
-              <span className="text-4xl font-bold">{plan.price}</span>
-              <span className="text-muted-foreground">{plan.period}</span>
-            </div>
-            <ul className="mt-8 space-y-2.5">
-              {plan.features.map((f: any) => (
-                <li key={f.text} className="flex items-center gap-3 text-sm">
-                  {f.ok ? (
-                    <Check className="h-4 w-4 text-emerald-500 shrink-0" />
-                  ) : (
-                    <X className="h-4 w-4 text-muted-foreground/40 shrink-0" />
-                  )}
-                  <span className={f.ok ? "" : "text-muted-foreground/50"}>
-                    {f.text}
-                  </span>
-                  {f.soon && (
-                    <span className="ml-auto rounded-full bg-amber-100 dark:bg-amber-900 px-2 py-0.5 text-[10px] text-amber-700 dark:text-amber-300">
-                      即将推出
-                    </span>
-                  )}
-                </li>
-              ))}
-            </ul>
-            <Button
-              variant={plan.ctaVariant}
-              className="mt-8 w-full"
-              disabled={plan.cta === "当前套餐"}
+        {plans.map((plan) => {
+          const isFreeCard = plan.name === "Free"
+          const isCurrentPlan =
+            (isFreeCard && !isPro) || (!isFreeCard && isPro)
+
+          return (
+            <div
+              key={plan.name}
+              className={`rounded-xl border p-8 ${
+                plan.featured
+                  ? "border-primary shadow-lg ring-1 ring-primary"
+                  : ""
+              }`}
             >
-              {plan.cta}
-            </Button>
-          </div>
-        ))}
+              {plan.featured && (
+                <span className="inline-block rounded-full bg-primary px-3 py-0.5 text-xs font-medium text-primary-foreground mb-4">
+                  推荐
+                </span>
+              )}
+              <h2 className="text-xl font-semibold">{plan.name}</h2>
+              <div className="mt-4 flex items-baseline gap-1">
+                <span className="text-4xl font-bold">{plan.price}</span>
+                <span className="text-muted-foreground">{plan.period}</span>
+              </div>
+              <ul className="mt-8 space-y-2.5">
+                {plan.features.map((f) => (
+                  <li key={f.text} className="flex items-center gap-3 text-sm">
+                    {f.ok ? (
+                      <Check className="h-4 w-4 text-emerald-500 shrink-0" />
+                    ) : (
+                      <X className="h-4 w-4 text-muted-foreground/40 shrink-0" />
+                    )}
+                    <span className={f.ok ? "" : "text-muted-foreground/50"}>
+                      {f.text}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+              <Button
+                variant={plan.ctaVariant}
+                className="mt-8 w-full"
+                disabled={isCurrentPlan || loading}
+                onClick={isFreeCard ? undefined : handleUpgrade}
+              >
+                {!isFreeCard && loading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    处理中...
+                  </>
+                ) : isCurrentPlan ? (
+                  "当前套餐"
+                ) : (
+                  plan.cta
+                )}
+              </Button>
+            </div>
+          )
+        })}
       </div>
     </div>
   )

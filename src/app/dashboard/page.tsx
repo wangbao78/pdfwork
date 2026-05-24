@@ -14,6 +14,8 @@ import {
   PRO_MAX_SIZE,
   PRO_MAX_PAGES,
 } from "@/lib/access"
+import { UpgradedBanner } from "@/components/shared/UpgradedBanner"
+import { ManageSubscriptionButton } from "@/components/shared/ManageSubscriptionButton"
 
 function today() {
   return new Date().toISOString().slice(0, 10)
@@ -61,6 +63,8 @@ export default async function DashboardPage() {
       <p className="mt-1 text-muted-foreground">
         欢迎回来，{user.name || user.email}
       </p>
+
+      <UpgradedBanner />
 
       <div className="mt-8 grid gap-6 sm:grid-cols-2">
         {/* Plan Card */}
@@ -115,9 +119,7 @@ export default async function DashboardPage() {
           </div>
           <div className="mt-4">
             {isPro ? (
-              <Button size="sm" variant="outline" disabled>
-                管理订阅
-              </Button>
+              <ManageSubscriptionButton />
             ) : (
               <Link href="/pricing">
                 <Button size="sm">

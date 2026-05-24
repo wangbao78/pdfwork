@@ -16,7 +16,7 @@ export async function createCheckoutSession(
 
   const session = await stripe.checkout.sessions.create({
     mode: "subscription",
-    payment_method_types: ["card"],
+    payment_method_types: ["card", "alipay", "wechat_pay"],
     customer_email: email,
     client_reference_id: userId,
     line_items: [
@@ -31,4 +31,19 @@ export async function createCheckoutSession(
   })
 
   return session.url
+}
+
+export async function createPortalSession(
+  customerId: string,
+  returnUrl: string,
+): Promise<string | null> {
+  const stripe = getStripe()
+  if (!stripe) return null
+
+  const portal = await stripe.billingPortal.sessions.create({
+    customer: customerId,
+    return_url: returnUrl,
+  })
+
+  return portal.url
 }
