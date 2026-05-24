@@ -1,5 +1,7 @@
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
+import { readFile, writeFile, mkdir } from "fs/promises"
+import { join } from "path"
 
 const QUOTA_ENABLED = process.env.ENABLE_QUOTA === "true"
 
@@ -23,8 +25,8 @@ const PRO_MAX_PAGES = 200
 const FREE_MAX_SIZE = 10 * 1024 * 1024  // 10MB
 const PRO_MAX_SIZE = 100 * 1024 * 1024  // 100MB
 
-// 简单的内存计数器（游客按 IP 统计，重启清空可接受）
-const guestCounters = new Map<string, { count: number; date: string }>()
+// 游客文件计数器
+const COUNTER_PATH = join(process.cwd(), ".data", "guest_counters.json")
 
 function today(): string {
   return new Date().toISOString().slice(0, 10)
@@ -135,18 +137,31 @@ export async function trackUsage(user: AccessUser): Promise<void> {
   } catch {}
 }
 
-/** 游客 IP 次数检查 */
-export function checkGuestQuota(ip: string): string | null {
+/** 游客 IP 次数检查（文件持久化，重启不丢） */
+export async function checkGuestQuota(ip: string): Promise<string | null> {
   if (!QUOTA_ENABLED) return null
+
+  // 读取计数器
+  let counters: Record<string, { count: number; date: string }> = {}
+  try {
+    const raw = await readFile(COUNTER_PATH, "utf-8")
+    counters = JSON.parse(raw)
+  } catch {}
+
   const key = `guest:${ip}`
-  const record = guestCounters.get(key)
+  const record = counters[key]
 
   if (!record || record.date !== today()) {
-    guestCounters.set(key, { count: 1, date: today() })
+    counters[key] = { count: 1, date: today() }
+    await mkdir(join(COUNTER_PATH, ".."), { recursive: true })
+    await writeFile(COUNTER_PATH, JSON.stringify(counters), "utf-8")
     return null
   }
 
   record.count++
+  counters[key] = record
+  await writeFile(COUNTER_PATH, JSON.stringify(counters), "utf-8")
+
   if (record.count > GUEST_DAILY) {
     return `今日免费次数已用完（${GUEST_DAILY} 次），请登录后继续使用`
   }

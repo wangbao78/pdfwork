@@ -37,7 +37,7 @@ export async function POST(req: Request) {
     // 限额检查
     const user = await getAccessUser()
     if (user.isGuest) {
-      const guestErr = checkGuestQuota(ip)
+      const guestErr = await checkGuestQuota(ip)
       if (guestErr) return apiError(guestErr, 429)
     } else {
       const quotaErr = await checkQuota(user, 0, 0)

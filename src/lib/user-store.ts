@@ -14,11 +14,14 @@ export interface UserRecord {
   createdAt: Date
 }
 
-// JSON file fallback
+// JSON file fallback (兼容旧对象格式)
 async function readUsers(): Promise<UserRecord[]> {
   try {
     const raw = await readFile(JSON_PATH, "utf-8")
-    return JSON.parse(raw)
+    const data = JSON.parse(raw)
+    if (Array.isArray(data)) return data
+    // 旧格式: { "email": {...} }
+    return Object.values(data) as UserRecord[]
   } catch {
     return []
   }
