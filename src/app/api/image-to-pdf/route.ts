@@ -1,8 +1,10 @@
 import { NextResponse } from "next/server"
 import { writeFile, mkdir } from "fs/promises"
 import { join } from "path"
+import { headers } from "next/headers"
 import { imagesToPdf } from "@/lib/pdf/image-to-pdf"
 import { cleanupOld } from "@/lib/cleanup"
+import { getAccessUser, checkQuota, checkGuestQuota, trackUsage } from "@/lib/access"
 
 const LOCAL_RESULTS = join(process.cwd(), ".data", "results")
 
@@ -10,6 +12,17 @@ export async function POST(req: Request) {
   cleanupOld()
 
   try {
+    // 限额检查
+    const ip = (await headers()).get("x-forwarded-for") || "unknown"
+    const user = await getAccessUser()
+    if (user.isGuest) {
+      const guestErr = await checkGuestQuota(ip)
+      if (guestErr) return NextResponse.json({ error: guestErr }, { status: 429 })
+    } else {
+      const quotaErr = await checkQuota(user, 0, 0)
+      if (quotaErr) return NextResponse.json({ error: quotaErr }, { status: 429 })
+    }
+
     const formData = await req.formData()
     const files = formData.getAll("files") as File[]
 
@@ -34,6 +47,8 @@ export async function POST(req: Request) {
     await mkdir(LOCAL_RESULTS, { recursive: true })
     const resultPath = join(LOCAL_RESULTS, resultName)
     await writeFile(resultPath, resultBuf)
+
+    trackUsage(user)
 
     return NextResponse.json({
       downloadUrl: `/api/download?file=${encodeURIComponent(resultPath)}`,

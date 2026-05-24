@@ -40,7 +40,7 @@ export default function ReorderPdfPage() {
       const formData = new FormData()
       formData.append("file", f)
       const res = await fetch("/api/upload", { method: "POST", body: formData })
-      if (!res.ok) throw new Error("上传失败")
+      if (!res.ok) { const data = await res.json().catch(() => ({})); throw new Error(data.error || "上传失败") }
       const { r2Key: key } = await res.json()
       setR2Key(key)
       setStep("ready")

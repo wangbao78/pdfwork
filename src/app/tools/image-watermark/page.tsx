@@ -8,12 +8,11 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Loader2, Image } from "lucide-react"
-import { UpgradePrompt, useCanUsePro } from "@/components/shared/UpgradePrompt"
+import { UpgradePrompt } from "@/components/shared/UpgradePrompt"
 
 type Step = "upload" | "uploading" | "wm_select" | "ready" | "processing" | "done"
 
 export default function ImageWatermarkPage() {
-  const { canUse } = useCanUsePro()
   const [step, setStep] = useState<Step>("upload")
   const [file, setFile] = useState<File | null>(null)
   const [r2Key, setR2Key] = useState<string | null>(null)
@@ -23,6 +22,7 @@ export default function ImageWatermarkPage() {
   const [scale, setScale] = useState(25)
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [trialUsed, setTrialUsed] = useState(false)
 
   const handlePdf = async (f: File) => {
     setFile(f)
@@ -31,7 +31,7 @@ export default function ImageWatermarkPage() {
     try {
       const fd = new FormData(); fd.append("file", f)
       const res = await fetch("/api/upload", { method: "POST", body: fd })
-      if (!res.ok) throw new Error("上传失败")
+      if (!res.ok) { const data = await res.json().catch(() => ({})); throw new Error(data.error || "上传失败") }
       const { r2Key: key } = await res.json()
       setR2Key(key)
       setStep("wm_select")
@@ -58,7 +58,7 @@ export default function ImageWatermarkPage() {
       fd.append("opacity", String(opacity / 100))
       fd.append("scale", String(scale / 100))
       const res = await fetch("/api/image-watermark", { method: "POST", body: fd })
-      if (!res.ok) { const { error: msg } = await res.json(); throw new Error(msg || "失败") }
+      if (!res.ok) { const data = await res.json().catch(() => ({})); if (data.trial) setTrialUsed(true); throw new Error(data.error || "失败") }
       const data = await res.json()
       setDownloadUrl(data.downloadUrl)
       setStep("done")
@@ -73,10 +73,10 @@ export default function ImageWatermarkPage() {
     setDownloadUrl(null); setError(null); setStep("upload")
   }
 
-  if (!canUse) {
+  if (trialUsed) {
     return (
       <ToolLayout title="图片水印" description="上传图片作为水印叠加到 PDF 中心位置。">
-        <UpgradePrompt tool="图片水印" />
+        <UpgradePrompt tool="图片水印" reason="trial_used" />
       </ToolLayout>
     )
   }

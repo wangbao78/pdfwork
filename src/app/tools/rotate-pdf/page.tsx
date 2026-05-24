@@ -53,7 +53,7 @@ export default function RotatePdfPage() {
       })
 
       if (!res.ok) {
-        const { error: msg } = await res.json()
+        const { error: msg } = await res.json().catch(() => ({ error: "旋转失败" }))
         throw new Error(msg || "旋转失败")
       }
 

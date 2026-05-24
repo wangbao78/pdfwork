@@ -1,22 +1,21 @@
 "use client"
 
 import { useState } from "react"
-import { useSession } from "next-auth/react"
 import { ToolLayout } from "@/components/shared/ToolLayout"
 import { DownloadButton } from "@/components/shared/DownloadButton"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Loader2, FileText } from "lucide-react"
-import { UpgradePrompt, useCanUsePro } from "@/components/shared/UpgradePrompt"
+import { UpgradePrompt } from "@/components/shared/UpgradePrompt"
 
 type Step = "select" | "uploading" | "processing" | "done"
 
 export default function OfficeToPdfPage() {
-  const { canUse } = useCanUsePro()
   const [step, setStep] = useState<Step>("select")
   const [file, setFile] = useState<File | null>(null)
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [trialUsed, setTrialUsed] = useState(false)
 
   const handleFile = async (f: File) => {
     setFile(f)
@@ -29,8 +28,9 @@ export default function OfficeToPdfPage() {
       const res = await fetch("/api/office-to-pdf", { method: "POST", body: formData })
 
       if (!res.ok) {
-        const { error: msg } = await res.json()
-        throw new Error(msg || "转换失败")
+        const data = await res.json().catch(() => ({}))
+        if (data.trial) setTrialUsed(true)
+        throw new Error(data.error || "转换失败")
       }
 
       const data = await res.json()
@@ -42,10 +42,10 @@ export default function OfficeToPdfPage() {
     }
   }
 
-  if (!canUse) {
+  if (trialUsed) {
     return (
       <ToolLayout title="Office 转 PDF" description="将 Word、Excel、PPT 文件转换为 PDF。">
-        <UpgradePrompt tool="Office 转 PDF" />
+        <UpgradePrompt tool="Office 转 PDF" reason="trial_used" />
       </ToolLayout>
     )
   }

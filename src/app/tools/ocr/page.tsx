@@ -6,12 +6,11 @@ import { ToolLayout } from "@/components/shared/ToolLayout"
 import { DownloadButton } from "@/components/shared/DownloadButton"
 import { Button } from "@/components/ui/button"
 import { Loader2, ScanText } from "lucide-react"
-import { UpgradePrompt, useCanUsePro } from "@/components/shared/UpgradePrompt"
+import { UpgradePrompt } from "@/components/shared/UpgradePrompt"
 
 type Step = "upload" | "uploading" | "ready" | "processing" | "done"
 
 export default function OcrPage() {
-  const { canUse } = useCanUsePro()
   const [step, setStep] = useState<Step>("upload")
   const [file, setFile] = useState<File | null>(null)
   const [r2Key, setR2Key] = useState<string | null>(null)
@@ -19,13 +18,14 @@ export default function OcrPage() {
   const [previewText, setPreviewText] = useState("")
   const [pageCount, setPageCount] = useState(0)
   const [error, setError] = useState<string | null>(null)
+  const [trialUsed, setTrialUsed] = useState(false)
 
   const handleFile = async (f: File) => {
     setFile(f); setStep("uploading"); setError(null)
     try {
       const fd = new FormData(); fd.append("file", f)
       const res = await fetch("/api/upload", { method: "POST", body: fd })
-      if (!res.ok) throw new Error("上传失败")
+      if (!res.ok) { const data = await res.json().catch(() => ({})); throw new Error(data.error || "上传失败") }
       const { r2Key: key } = await res.json()
       setR2Key(key); setStep("ready")
     } catch (e) {
@@ -43,7 +43,7 @@ export default function OcrPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ r2Key }),
       })
-      if (!res.ok) { const { error: msg } = await res.json(); throw new Error(msg || "识别失败") }
+      if (!res.ok) { const data = await res.json().catch(() => ({})); if (data.trial) setTrialUsed(true); throw new Error(data.error || "识别失败") }
       const data = await res.json()
       setDownloadUrl(data.downloadUrl)
       setPreviewText(data.text)
@@ -57,10 +57,10 @@ export default function OcrPage() {
 
   const reset = () => { setFile(null); setR2Key(null); setDownloadUrl(null); setPreviewText(""); setError(null); setStep("upload") }
 
-  if (!canUse) {
+  if (trialUsed) {
     return (
       <ToolLayout title="OCR 识别" description="从扫描件或图片 PDF 中识别文字，输出为 Word 文档。">
-        <UpgradePrompt tool="OCR 识别" />
+        <UpgradePrompt tool="OCR 识别" reason="trial_used" />
       </ToolLayout>
     )
   }

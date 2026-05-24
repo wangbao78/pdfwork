@@ -47,7 +47,7 @@ export default function ImageToPdfPage() {
       const res = await fetch("/api/image-to-pdf", { method: "POST", body: formData })
 
       if (!res.ok) {
-        const { error: msg } = await res.json()
+        const { error: msg } = await res.json().catch(() => ({ error: "转换失败" }))
         throw new Error(msg || "转换失败")
       }
 

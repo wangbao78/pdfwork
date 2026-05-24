@@ -6,7 +6,7 @@ import { DownloadButton } from "@/components/shared/DownloadButton"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Loader2, Code2 } from "lucide-react"
-import { UpgradePrompt, useCanUsePro } from "@/components/shared/UpgradePrompt"
+import { UpgradePrompt } from "@/components/shared/UpgradePrompt"
 
 type Step = "edit" | "processing" | "done"
 
@@ -18,11 +18,11 @@ const SAMPLE = `<h1>Hello World</h1>
 </table>`
 
 export default function HtmlToPdfPage() {
-  const { canUse } = useCanUsePro()
   const [step, setStep] = useState<Step>("edit")
   const [html, setHtml] = useState(SAMPLE)
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [trialUsed, setTrialUsed] = useState(false)
 
   const handleConvert = async () => {
     if (!html.trim()) return
@@ -33,7 +33,7 @@ export default function HtmlToPdfPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ html }),
       })
-      if (!res.ok) { const { error: msg } = await res.json(); throw new Error(msg || "转换失败") }
+      if (!res.ok) { const data = await res.json().catch(() => ({})); if (data.trial) setTrialUsed(true); throw new Error(data.error || "转换失败") }
       const data = await res.json()
       setDownloadUrl(data.downloadUrl)
       setStep("done")
@@ -43,10 +43,10 @@ export default function HtmlToPdfPage() {
     }
   }
 
-  if (!canUse) {
+  if (trialUsed) {
     return (
       <ToolLayout title="HTML 转 PDF" description="将 HTML 内容转换为 PDF 文件。">
-        <UpgradePrompt tool="HTML 转 PDF" />
+        <UpgradePrompt tool="HTML 转 PDF" reason="trial_used" />
       </ToolLayout>
     )
   }

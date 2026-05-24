@@ -34,7 +34,7 @@ export default function PageNumberPage() {
     try {
       const fd = new FormData(); fd.append("file", f)
       const res = await fetch("/api/upload", { method: "POST", body: fd })
-      if (!res.ok) throw new Error("上传失败")
+      if (!res.ok) { const data = await res.json().catch(() => ({})); throw new Error(data.error || "上传失败") }
       const { r2Key: key } = await res.json()
       setR2Key(key); setStep("ready")
     } catch (e) {

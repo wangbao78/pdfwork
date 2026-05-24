@@ -14,7 +14,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Loader2 } from "lucide-react"
-import { UpgradePrompt, useCanUsePro } from "@/components/shared/UpgradePrompt"
+import { UpgradePrompt } from "@/components/shared/UpgradePrompt"
 
 type CompressLevel = "standard" | "high" | "extreme"
 type Step = "upload" | "uploading" | "ready" | "processing" | "done"
@@ -26,7 +26,6 @@ const LEVEL_LABELS: Record<CompressLevel, string> = {
 }
 
 export default function CompressPdfPage() {
-  const { canUse } = useCanUsePro()
   const [step, setStep] = useState<Step>("upload")
   const [file, setFile] = useState<File | null>(null)
   const [r2Key, setR2Key] = useState<string | null>(null)
@@ -34,6 +33,7 @@ export default function CompressPdfPage() {
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null)
   const [sizes, setSizes] = useState<{ original: number; compressed: number } | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [trialUsed, setTrialUsed] = useState(false)
 
   const handleFile = async (f: File) => {
     setFile(f)
@@ -65,10 +65,6 @@ export default function CompressPdfPage() {
 
   const handleCompress = async () => {
     if (!r2Key) return
-    if (level === "extreme" && !canUse) {
-      setError("极限压缩为 Pro 专享功能，请升级后使用")
-      return
-    }
     setStep("processing")
     setError(null)
 
@@ -80,8 +76,9 @@ export default function CompressPdfPage() {
       })
 
       if (!res.ok) {
-        const { error: msg } = await res.json()
-        throw new Error(msg || "压缩失败")
+        const data = await res.json().catch(() => ({}))
+        if (data.trial) setTrialUsed(true)
+        throw new Error(data.error || "压缩失败")
       }
 
       const data = await res.json()
@@ -112,6 +109,14 @@ export default function CompressPdfPage() {
   const reduction = sizes
     ? Math.round((1 - sizes.compressed / sizes.original) * 100)
     : 0
+
+  if (trialUsed) {
+    return (
+      <ToolLayout title="压缩 PDF" description="减小 PDF 文件体积。提供标准、高、极限三种压缩级别。">
+        <UpgradePrompt tool="极限压缩" reason="trial_used" />
+      </ToolLayout>
+    )
+  }
 
   return (
     <ToolLayout

@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Loader2, Plus, X } from "lucide-react"
-import { UpgradePrompt, useCanUsePro } from "@/components/shared/UpgradePrompt"
+import { UpgradePrompt } from "@/components/shared/UpgradePrompt"
 
 type Step = "select" | "uploading" | "ready" | "processing" | "done"
 
@@ -18,7 +18,6 @@ const OPS = [
 ]
 
 export default function BatchPage() {
-  const { canUse } = useCanUsePro()
   const [step, setStep] = useState<Step>("select")
   const [files, setFiles] = useState<{ file: File; r2Key?: string }[]>([])
   const [operation, setOperation] = useState("convert")
@@ -26,6 +25,7 @@ export default function BatchPage() {
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null)
   const [stats, setStats] = useState({ total: 0, ok: 0, failed: 0 })
   const [error, setError] = useState<string | null>(null)
+  const [trialUsed, setTrialUsed] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
   const handleSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -45,7 +45,7 @@ export default function BatchPage() {
       const fd = new FormData()
       fd.append("file", files[i].file)
       const res = await fetch("/api/upload", { method: "POST", body: fd })
-      if (!res.ok) throw new Error(`上传 ${files[i].file.name} 失败`)
+      if (!res.ok) { const data = await res.json().catch(() => ({})); throw new Error(data.error || `上传 ${files[i].file.name} 失败`) }
       const { r2Key } = await res.json()
       keys.push(r2Key)
       setFiles((prev) => prev.map((f, idx) => idx === i ? { ...f, r2Key } : f))
@@ -68,7 +68,7 @@ export default function BatchPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       })
-      if (!res.ok) { const { error: msg } = await res.json(); throw new Error(msg || "处理失败") }
+      if (!res.ok) { const data = await res.json().catch(() => ({})); if (data.trial) setTrialUsed(true); throw new Error(data.error || "处理失败") }
       const data = await res.json()
       setDownloadUrl(data.downloadUrl)
       setStats({ total: data.total, ok: data.ok, failed: data.failed })
@@ -84,10 +84,10 @@ export default function BatchPage() {
     setStep("select"); setStats({ total: 0, ok: 0, failed: 0 })
   }
 
-  if (!canUse) {
+  if (trialUsed) {
     return (
       <ToolLayout title="批量处理" description="一次上传多个 PDF，统一操作，结果打包下载。">
-        <UpgradePrompt tool="批量处理" />
+        <UpgradePrompt tool="批量处理" reason="trial_used" />
       </ToolLayout>
     )
   }
