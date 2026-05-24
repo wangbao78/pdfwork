@@ -78,7 +78,8 @@ def main():
         print("Usage: python batch_process.py input.json output_dir", file=sys.stderr)
         sys.exit(1)
 
-    data = json.loads(sys.argv[1])
+    with open(sys.argv[1], "r", encoding="utf-8") as f:
+        data = json.load(f)
     output_dir = sys.argv[2]
     os.makedirs(output_dir, exist_ok=True)
 
