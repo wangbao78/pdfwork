@@ -25,8 +25,9 @@ const PRO_MAX_PAGES = 200
 const FREE_MAX_SIZE = 10 * 1024 * 1024  // 10MB
 const PRO_MAX_SIZE = 100 * 1024 * 1024  // 100MB
 
-// 游客文件计数器
+// 文件计数器
 const COUNTER_PATH = join(process.cwd(), ".data", "guest_counters.json")
+const USER_COUNTER_PATH = join(process.cwd(), ".data", "user_counters.json")
 
 function today(): string {
   return new Date().toISOString().slice(0, 10)
@@ -101,7 +102,6 @@ export async function checkQuota(
     const dbUser = await db.user.findUnique({ where: { id: user.id! } })
     if (!dbUser) return null
 
-    const now = new Date()
     const isNewDay = !dbUser.lastUsageDate || new Date(dbUser.lastUsageDate).toISOString().slice(0, 10) !== today()
     const dailyUsage = isNewDay ? 0 : dbUser.dailyUsage
 
@@ -109,7 +109,17 @@ export async function checkQuota(
       return `今日已使用 ${FREE_DAILY} 次，升级 Pro 不限次数`
     }
   } catch {
-    // DB 不可用时放行
+    // DB 不可用，回退到文件计数器
+    const userId = user.id!
+    let counters: Record<string, { count: number; date: string }> = {}
+    try {
+      const raw = await readFile(USER_COUNTER_PATH, "utf-8")
+      counters = JSON.parse(raw)
+    } catch {}
+    const record = counters[userId]
+    if (record && record.date === today() && record.count >= FREE_DAILY) {
+      return `今日已使用 ${FREE_DAILY} 次，升级 Pro 不限次数`
+    }
   }
 
   return null
@@ -134,7 +144,23 @@ export async function trackUsage(user: AccessUser): Promise<void> {
         lastUsageDate: now,
       },
     })
-  } catch {}
+  } catch {
+    // DB 不可用，回退到文件计数器
+    const userId = user.id!
+    let counters: Record<string, { count: number; date: string }> = {}
+    try {
+      const raw = await readFile(USER_COUNTER_PATH, "utf-8")
+      counters = JSON.parse(raw)
+    } catch {}
+    const record = counters[userId]
+    const td = today()
+    counters[userId] = {
+      count: (record?.date === td ? (record?.count || 0) : 0) + 1,
+      date: td,
+    }
+    await mkdir(join(USER_COUNTER_PATH, ".."), { recursive: true })
+    await writeFile(USER_COUNTER_PATH, JSON.stringify(counters), "utf-8")
+  }
 }
 
 /** 游客 IP 次数检查（文件持久化，重启不丢） */
