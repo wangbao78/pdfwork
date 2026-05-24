@@ -28,11 +28,14 @@ def main():
 
         # OCR with Tesseract (Chinese simplified + English)
         txt_path = os.path.join(output_dir, f"page_{page_num+1}")
-        subprocess.run([
+        result = subprocess.run([
             "tesseract", img_path, txt_path,
             "-l", "chi_sim+eng",
             "--psm", "6",
-        ], capture_output=True, timeout=60)
+        ], capture_output=True, timeout=120)
+
+        if result.returncode != 0:
+            raise Exception(f"Tesseract error (page {page_num+1}): {result.stderr.decode('utf-8', errors='ignore')[:300]}")
 
         txt_file = txt_path + ".txt"
         if os.path.exists(txt_file):
@@ -40,6 +43,8 @@ def main():
                 page_text = f.read().strip()
         else:
             page_text = ""
+        if not page_text:
+            page_text = "(本页未识别到文字)"
 
         full_text.append(page_text)
         os.remove(img_path)  # Clean up image
