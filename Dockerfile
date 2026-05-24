@@ -19,7 +19,7 @@ COPY package.json package-lock.json ./
 RUN npm ci
 
 COPY . .
-RUN npm run build
+RUN DATABASE_URL=postgresql://dummy npx prisma generate && npm run build
 
 EXPOSE 3000
-CMD sh -c "npx prisma generate && npx prisma db push --accept-data-loss && npm start"
+CMD sh -c "npx prisma db push --accept-data-loss && npm start"

@@ -147,7 +147,7 @@ export default async function AdminUserDetailPage({
                 <tr className="border-b bg-muted/50">
                   <th className="px-4 py-3 text-left font-medium">文件名</th>
                   <th className="px-4 py-3 text-left font-medium hidden sm:table-cell">
-                    类型
+                    功能
                   </th>
                   <th className="px-4 py-3 text-right font-medium">大小</th>
                   <th className="px-4 py-3 text-left font-medium">状态</th>
@@ -168,7 +168,7 @@ export default async function AdminUserDetailPage({
                         {f.name}
                       </td>
                       <td className="px-4 py-3 text-muted-foreground hidden sm:table-cell">
-                        {f.type || "-"}
+                        {f.tool || "-"}
                       </td>
                       <td className="px-4 py-3 text-right tabular-nums">
                         {formatSize(f.size)}
