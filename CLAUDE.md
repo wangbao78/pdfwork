@@ -16,28 +16,23 @@ Next.js 16.2.6 (App Router + Turbopack) SaaS 网站，提供 18 个 PDF 在线�
 ## 环境与命令
 
 ```bash
-# Node.js 路径
-export PATH="/d/nodejs:$PATH"
-
-# Bash CWD 默认 d:/vscode，操作 pdfwork 需先 cd
+# 所有命令必须在 pdfwork 目录下执行
 cd /d/vscode/pdfwork
 
-# 构建（必须在 pdfwork 目录下执行）
-npm run build
-# 或完整命令：
-cd /d/vscode/pdfwork && export PATH="/d/nodejs:$PATH" && npx next build
+# 构建
+/d/nodejs/npx next build
 
 # Railway 部署
-npx railway up --service api
+/d/nodejs/npx railway up --service api
 
 # 查看 Railway 部署状态
-npx railway deployment list --service api
+/d/nodejs/npx railway deployment list --service api
 
 # 查看 Railway 变量
-npx railway variables --service api
+/d/nodejs/npx railway variables --service api
 
 # 设置 Railway 变量（设置后自动触发重部署）
-npx railway variables set KEY=VALUE --service api
+/d/nodejs/npx railway variables set KEY=VALUE --service api
 ```
 
 ### 构建/部署注意事项
