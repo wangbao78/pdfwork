@@ -74,9 +74,9 @@ export default async function AdminLogsPage({
 
   const countMap = new Map(statusCounts.map((s) => [s.value, s.count]))
 
-  function link(pageNum: number) {
+  function makeLink(p: number) {
     const params = new URLSearchParams()
-    params.set("page", String(pageNum))
+    params.set("page", String(p))
     if (status) params.set("status", status)
     if (q) params.set("q", q)
     if (userFilter) params.set("user", userFilter)
@@ -89,6 +89,13 @@ export default async function AdminLogsPage({
     if (q) params.set("q", q)
     if (userFilter) params.set("user", userFilter)
     return `/admin/logs?${params.toString()}`
+  }
+
+  const navLinks = {
+    first: page > 1 ? makeLink(1) : null,
+    prev: page > 1 ? makeLink(page - 1) : null,
+    next: page < totalPages ? makeLink(page + 1) : null,
+    last: page < totalPages ? makeLink(totalPages) : null,
   }
 
   const rows = files.map((f) => {
@@ -162,7 +169,7 @@ export default async function AdminLogsPage({
         total={total}
         page={page}
         totalPages={totalPages}
-        link={link}
+        navLinks={navLinks}
       />
     </div>
   )

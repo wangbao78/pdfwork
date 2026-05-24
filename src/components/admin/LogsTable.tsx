@@ -33,15 +33,22 @@ interface FileRow {
   userLabel: string
 }
 
+interface NavLinks {
+  first: string | null
+  prev: string | null
+  next: string | null
+  last: string | null
+}
+
 interface Props {
   files: FileRow[]
   total: number
   page: number
   totalPages: number
-  link: (p: number) => string
+  navLinks: NavLinks
 }
 
-export function LogsTable({ files, total, page, totalPages, link }: Props) {
+export function LogsTable({ files, total, page, totalPages, navLinks }: Props) {
   const router = useRouter()
   const [selected, setSelected] = useState<Set<string>>(new Set())
   const [deleting, setDeleting] = useState(false)
@@ -197,8 +204,8 @@ export function LogsTable({ files, total, page, totalPages, link }: Props) {
             第 {page} / {totalPages} 页，共 {total} 条
           </span>
           <div className="flex gap-2">
-            {page > 1 ? (
-              <Link href={link(1)}>
+            {navLinks.first ? (
+              <Link href={navLinks.first}>
                 <Button variant="outline" size="sm" title="首页">
                   <ChevronFirst className="h-4 w-4" />
                 </Button>
@@ -208,8 +215,8 @@ export function LogsTable({ files, total, page, totalPages, link }: Props) {
                 <ChevronFirst className="h-4 w-4" />
               </Button>
             )}
-            {page > 1 ? (
-              <Link href={link(page - 1)}>
+            {navLinks.prev ? (
+              <Link href={navLinks.prev}>
                 <Button variant="outline" size="sm">
                   <ChevronLeft className="h-4 w-4 mr-1" />
                   上一页
@@ -221,8 +228,8 @@ export function LogsTable({ files, total, page, totalPages, link }: Props) {
                 上一页
               </Button>
             )}
-            {page < totalPages ? (
-              <Link href={link(page + 1)}>
+            {navLinks.next ? (
+              <Link href={navLinks.next}>
                 <Button variant="outline" size="sm">
                   下一页
                   <ChevronRight className="h-4 w-4 ml-1" />
@@ -234,8 +241,8 @@ export function LogsTable({ files, total, page, totalPages, link }: Props) {
                 <ChevronRight className="h-4 w-4 ml-1" />
               </Button>
             )}
-            {page < totalPages ? (
-              <Link href={link(totalPages)}>
+            {navLinks.last ? (
+              <Link href={navLinks.last}>
                 <Button variant="outline" size="sm" title="末页">
                   <ChevronLast className="h-4 w-4" />
                 </Button>
